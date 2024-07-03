@@ -15,6 +15,14 @@ public class ActivityDTO {
     @Size(min = 2, max = 100, message = "Описание должно содержать от 2 до 100 символов!")
     private String description;
 
+    public ActivityDTO() {
+    }
+
+    public ActivityDTO(Long id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
 
     public Long getId() {
         return id;
