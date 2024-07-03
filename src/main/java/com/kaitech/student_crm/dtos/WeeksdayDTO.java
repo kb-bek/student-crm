@@ -9,6 +9,14 @@ public class WeeksdayDTO {
     @NotEmpty
     private String name;
 
+    public WeeksdayDTO() {
+    }
+
+    public WeeksdayDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

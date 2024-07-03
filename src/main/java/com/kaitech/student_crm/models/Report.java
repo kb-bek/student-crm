@@ -25,7 +25,25 @@ public class Report {
     @JoinColumn(name = "weeksday_id", nullable = false)
     private Weeksday weeksday;
 
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
+    @Column(nullable = false)
+    private boolean isDone;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
+    }
+
     @Column(updatable = false)
     private LocalDateTime createdDate;
 

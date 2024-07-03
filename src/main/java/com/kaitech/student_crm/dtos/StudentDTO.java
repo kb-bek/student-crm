@@ -13,6 +13,16 @@ public class StudentDTO {
     @NotEmpty
     private String phoneNumber;
 
+    public StudentDTO() {
+    }
+
+    public StudentDTO(Long id, String firstname, String lastname, String email, String phoneNumber) {
+        this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
     public Long getId() {
         return id;
