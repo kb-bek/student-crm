@@ -30,7 +30,7 @@ public class ActivityController {
     private  ModelMapper modelMapper;
 
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Activity> getAllActivity(){
         return activityService.findAll();
     }
@@ -65,7 +65,7 @@ public class ActivityController {
     }
 
     // Метод для обновления Activity
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<HttpStatus> updateActivity(@PathVariable Long id, @RequestBody @Valid ActivityDTO activityDTO,
                                                      BindingResult result) {
         if (result.hasErrors()) {
@@ -86,7 +86,7 @@ public class ActivityController {
     }
 
     // Метод для удаления Activity
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<HttpStatus> deleteActivity(@PathVariable Long id) {
         activityService.deleteActivity(id);
         return ResponseEntity.ok(HttpStatus.OK);
