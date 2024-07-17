@@ -37,4 +37,6 @@ public class DirectionDTO {
     public void setName(@NotEmpty String name) {
         this.name = name;
     }
+
+
 }
