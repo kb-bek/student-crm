@@ -49,7 +49,7 @@ public class StudentUserService {
         try {
             LOGGER.info("Saving Student {}", student.getEmail());
             return studentUserRepository.save(newStudent);
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Error during registration, {}", e.getMessage());
             throw new UserExistException("The student " + newStudent.getFirstname() + " " + newStudent.getLastname() + " already exist");
         }
@@ -58,7 +58,7 @@ public class StudentUserService {
     public User updateStudent(Long studentId, StudentDTO updatedStudent) {
         Optional<User> studentOptional = studentUserRepository.findById(studentId);
 
-        if(studentOptional.isPresent()) {
+        if (studentOptional.isPresent()) {
             User student = studentOptional.get();
             student.setFirstname(updatedStudent.getFirstname());
             student.setLastname(updatedStudent.getLastname());
@@ -70,8 +70,8 @@ public class StudentUserService {
         }
     }
 
-    public List<User> getAllStudents() {
-        return studentUserRepository.findByRolesContaining(ERole.ROlE_STUDENT);
+    public List<StudentDTO> getAllStudents() {
+        return studentUserRepository.findAllStudentDTOByRole(ERole.ROlE_STUDENT);
     }
 
     public User getStudentById(Long studentId) {

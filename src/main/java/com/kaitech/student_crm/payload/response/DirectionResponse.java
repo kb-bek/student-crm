@@ -13,6 +13,11 @@ public class DirectionResponse {
     public DirectionResponse() {
     }
 
+    public DirectionResponse(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public DirectionResponse(Long id, String name, List<StudentDTO> students) {
         this.id = id;
         this.name = name;

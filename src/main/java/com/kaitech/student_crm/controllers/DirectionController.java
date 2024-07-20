@@ -7,6 +7,7 @@ import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
+import com.kaitech.student_crm.repositories.DirectionRepository;
 import com.kaitech.student_crm.services.DirectionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,34 +29,17 @@ public class DirectionController {
 
     @GetMapping("/all")
     public ResponseEntity<List<DirectionResponse>> getAllDirectionsWithStudents() {
-        List<Direction> directions = directionService.getAllDirectionsWithStudents();
-        if (directions.isEmpty()) {
+        List<DirectionResponse> directions = directionService.findAllResponse();
+        if (directions.isEmpty())
             return ResponseEntity.noContent().build();
-        }
-
-        List<DirectionResponse> responseList = directions.stream()
-                .map(d -> new DirectionResponse(d.getId(), d.getName(),
-                        d.getStudents().stream()
-                                .map(this::convertToStudentDTO)
-                                .collect(Collectors.toList())))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(responseList);
+        return ResponseEntity.ok(directions);
     }
 
-    @GetMapping("/{directionId}")
-    public ResponseEntity<DirectionResponse> getDirectionWithStudents(@PathVariable Long directionId) {
-        Direction direction = directionService.getDirectionWithStudents(directionId);
-        if (direction == null) {
+    @GetMapping("/{directorId}")
+    public ResponseEntity<DirectionResponse> getDirectorWithStudents(@PathVariable Long directorId) {
+        DirectionResponse response = directionService.findByIdResponse(directorId);
+        if (response == null)
             return ResponseEntity.notFound().build();
-        }
-
-        // Преобразование Direction в DirectionResponse
-        DirectionResponse response = new DirectionResponse(direction.getId(), direction.getName(),
-                direction.getStudents().stream()
-                        .map(this::convertToStudentDTO)
-                        .collect(Collectors.toList()));
-
         return ResponseEntity.ok(response);
     }
 
@@ -80,11 +64,11 @@ public class DirectionController {
         return ResponseEntity.ok(new MessageResponse("Direction was deleted"));
     }
 
-    private StudentDTO convertToStudentDTO(User student){
+    private StudentDTO convertToStudentDTO(User student) {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-    private DirectionDTO convertToDirectionDTO(Direction direction){
+    private DirectionDTO convertToDirectionDTO(Direction direction) {
         return modelMapper.map(direction, DirectionDTO.class);
     }
 }

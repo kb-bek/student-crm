@@ -39,11 +39,7 @@ public class DropdownController {
 
     @GetMapping("/students")
     public List<StudentDTO> getAllStudents() {
-        List<User> studentList = studentUserService.getAllStudents();
-
-        return studentList.stream()
-                .map(this::convertToStudentDTO)
-                .collect(Collectors.toList());
+        return studentUserService.getAllStudents();
     }
 
     @GetMapping("/activities")
@@ -64,11 +60,11 @@ public class DropdownController {
                 .collect(Collectors.toList());
     }
 
-    private StudentDTO convertToStudentDTO(User student){
+    private StudentDTO convertToStudentDTO(User student) {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-    private ActivityDTO convertToActivityDTO(Activity activity){
+    private ActivityDTO convertToActivityDTO(Activity activity) {
         return modelMapper.map(activity, ActivityDTO.class);
     }
 
