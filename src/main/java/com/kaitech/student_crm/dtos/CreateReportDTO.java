@@ -12,6 +12,8 @@ public class CreateReportDTO {
 
     @NotNull(message = "Weeksday ID cannot be null")
     private Long weeksdayId;
+
+    @NotNull(message = "The field should not be empty")
     private boolean isDone;
 
 

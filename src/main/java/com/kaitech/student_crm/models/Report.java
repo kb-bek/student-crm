@@ -28,6 +28,25 @@ public class Report {
     @Column(nullable = false)
     private boolean isDone;
 
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    public Report() {
+    }
+
+    public Report(User user, Activity activity, Weeksday weeksday, boolean isDone) {
+        this.user = user;
+        this.activity = activity;
+        this.weeksday = weeksday;
+        this.isDone = isDone();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -43,26 +62,6 @@ public class Report {
     public void setDone(boolean done) {
         isDone = done;
     }
-
-    @Column(updatable = false)
-    private LocalDateTime createdDate;
-
-    public Report() {
-    }
-
-    public Report(User user, Activity activity, Weeksday weeksday) {
-        this.user = user;
-        this.activity = activity;
-        this.weeksday = weeksday;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdDate = LocalDateTime.now();
-    }
-
-
-
 
     public User getUser() {
         return user;

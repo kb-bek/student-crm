@@ -15,4 +15,6 @@ public interface StudentUserRepository extends JpaRepository<User, Long> {
     List<User> findByRolesContaining(ERole role);
 
     Optional<User> findUserById(Long id);
+
+    boolean existsByUsername(String username);
 }

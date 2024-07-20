@@ -11,6 +11,17 @@ public class StudentDataRequest {
     @ValidEmail
     private String email;
 
+    @NotEmpty
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @NotEmpty(message = "Please enter student's name")
     private String firstname;
 
@@ -19,6 +30,28 @@ public class StudentDataRequest {
 
     @NotEmpty(message = "Please enter student's phone number")
     private String phoneNumber;
+
+    @NotEmpty
+    private String password;
+
+    @NotEmpty
+    private String confirmPassword;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
 
     public @Email(message = "It should have email format") @NotBlank(message = "Student email is required") String getEmail() {
         return email;

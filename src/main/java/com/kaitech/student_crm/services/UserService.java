@@ -36,7 +36,15 @@ public class UserService {
         newUser.setLastname(user.getLastname());
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        newUser.getRoles().add(ERole.ROLE_ADMIN);
+        // изменил роль из админа на роль студента//
+        newUser.getRoles().add(ERole.ROlE_STUDENT);
+
+        if(userRepository.existsByUsername(user.getUsername())){
+            throw new RuntimeException("Username must be unique");
+        }
+        if(!user.getPassword().equals(user.getConfirmPassword())){
+            throw new RuntimeException("Password mismatch");
+        }
 
         try {
             LOGGER.info("Saving User {}", user.getEmail());

@@ -38,6 +38,14 @@ public class StudentUserService {
         newStudent.setPhoneNumber(student.getPhoneNumber());
         newStudent.getRoles().add(ERole.ROlE_STUDENT);
 
+        if(studentUserRepository.existsByUsername(student.getUsername())){
+            throw new RuntimeException("Username must be unique");
+        }
+
+        if(!student.getConfirmPassword().equals(student.getPassword())){
+            throw new RuntimeException("Password mismatch");
+        }
+
         try {
             LOGGER.info("Saving Student {}", student.getEmail());
             return studentUserRepository.save(newStudent);
