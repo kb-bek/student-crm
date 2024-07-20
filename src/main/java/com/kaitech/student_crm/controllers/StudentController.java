@@ -44,12 +44,7 @@ public class StudentController {
 
     @GetMapping("/all")
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
-        List<StudentDTO> students = studentUserService.getAllStudents()
-                .stream()
-                .map(this::convertToStudentDTO)
-                .collect(Collectors.toList());
-
-        return new ResponseEntity<>(students, HttpStatus.OK);
+        return new ResponseEntity<>(studentUserService.getAllStudents(), HttpStatus.OK);
     }
 
     @PostMapping("/new")
@@ -59,13 +54,13 @@ public class StudentController {
         if (!ObjectUtils.isEmpty(errors)) {
             return errors;
         }
-        
+
         studentUserService.createStudent(studentDataRequest);
         return ResponseEntity.ok(new MessageResponse("Student added successfully"));
     }
 
     @PostMapping("/{id}/delete")
-    public ResponseEntity<MessageResponse> deleteStudent(@PathVariable("id") String studentId){
+    public ResponseEntity<MessageResponse> deleteStudent(@PathVariable("id") String studentId) {
         studentUserService.deleteStudent(Long.parseLong(studentId));
         return new ResponseEntity<>(new MessageResponse("Student was deleted"), HttpStatus.OK);
     }
@@ -84,7 +79,7 @@ public class StudentController {
     }
 
 
-    private StudentDTO convertToStudentDTO(User student){
+    private StudentDTO convertToStudentDTO(User student) {
         return modelMapper.map(student, StudentDTO.class);
     }
 

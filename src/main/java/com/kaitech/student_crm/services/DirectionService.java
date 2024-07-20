@@ -1,11 +1,10 @@
 package com.kaitech.student_crm.services;
 
-import com.kaitech.student_crm.dtos.AssignDirectionDTO;
 import com.kaitech.student_crm.dtos.DirectionDTO;
-import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.User;
+import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.repositories.DirectionRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,4 +68,15 @@ public class DirectionService {
         directionRepository.delete(direction);
     }
 
+    public List<DirectionResponse> findAllResponse() {
+        return directionRepository.findAllDirectorResponse().stream()
+                .peek(dto -> dto.setStudents(studentUserRepository.findAllByDirectorId(dto.getId())))
+                .collect(Collectors.toList());
+    }
+
+    public DirectionResponse findByIdResponse(Long directorId) {
+        DirectionResponse response = directionRepository.findByIdDirectorResponse(directorId);
+        response.setStudents(studentUserRepository.findAllByDirectorId(directorId));
+        return response;
+    }
 }
