@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.payload.request.StudentDataRequest;
 import com.kaitech.student_crm.payload.response.MessageResponse;
@@ -36,7 +37,7 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentDTO> getStudent(@PathVariable("id") String studentId) {
-        User student = studentUserService.getStudentById(Long.parseLong(studentId));
+        Student student = studentUserService.getStudentById(Long.parseLong(studentId));
         StudentDTO studentDTO = convertToStudentDTO(student);
         return new ResponseEntity<>(studentDTO, HttpStatus.OK);
     }
@@ -75,14 +76,14 @@ public class StudentController {
             return errors;
         }
 
-        User student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
+        Student student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
         StudentDTO updatedStudent = convertToStudentDTO(student);
 
         return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
     }
 
 
-    private StudentDTO convertToStudentDTO(User student) {
+    private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);
     }
 

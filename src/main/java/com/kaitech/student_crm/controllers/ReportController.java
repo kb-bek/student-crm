@@ -1,11 +1,9 @@
 package com.kaitech.student_crm.controllers;
 
-import com.kaitech.student_crm.dtos.*;
-import com.kaitech.student_crm.exceptions.ActivityNotFoundException;
-import com.kaitech.student_crm.models.Activity;
+import com.kaitech.student_crm.dtos.CreateReportDTO;
+import com.kaitech.student_crm.dtos.ReportDTO;
+import com.kaitech.student_crm.dtos.ReportResponseDTO;
 import com.kaitech.student_crm.models.Report;
-import com.kaitech.student_crm.models.User;
-import com.kaitech.student_crm.models.Weeksday;
 import com.kaitech.student_crm.services.ActivityService;
 import com.kaitech.student_crm.services.ReportService;
 import com.kaitech.student_crm.services.StudentUserService;

@@ -14,8 +14,8 @@ public class Report {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @ManyToOne
     @JoinColumn(name = "activity_id", nullable = false)
@@ -34,8 +34,7 @@ public class Report {
     public Report() {
     }
 
-    public Report(User user, Activity activity, Weeksday weeksday, boolean isDone) {
-        this.user = user;
+    public Report(Activity activity, Weeksday weeksday) {
         this.activity = activity;
         this.weeksday = weeksday;
         this.isDone = isDone();
@@ -46,15 +45,9 @@ public class Report {
         this.createdDate = LocalDateTime.now();
     }
 
-
-    public Long getId() {
-        return id;
+    public Student getStudent() {
+        return student;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public boolean isDone() {
         return isDone;
     }
@@ -62,13 +55,8 @@ public class Report {
     public void setDone(boolean done) {
         isDone = done;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public Activity getActivity() {

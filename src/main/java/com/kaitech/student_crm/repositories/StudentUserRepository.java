@@ -1,8 +1,9 @@
 package com.kaitech.student_crm.repositories;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
-import com.kaitech.student_crm.models.roles.ERole;
+import com.kaitech.student_crm.models.enums.ERole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,8 @@ import java.util.Optional;
 
 
 @Repository
-public interface StudentUserRepository extends JpaRepository<User, Long> {
-    Optional<User> findUserById(Long id);
+public interface StudentUserRepository extends JpaRepository<Student, Long> {
+    Optional<Student> findUserById(Long id);
 
     boolean existsByUsername(String username);
 
@@ -22,13 +23,13 @@ public interface StudentUserRepository extends JpaRepository<User, Long> {
             select
             new com.kaitech.student_crm.dtos.StudentDTO(
             u.id,
-            u.firstname,
-            u.lastname,
+            u.firstName,
+            u.lastName,
             u.email,
             u.phoneNumber
             )
-            from User u
-            where :role member of u.roles
+            from Student u
+            where u.user.role = :role
             order by u.id
             """)
     List<StudentDTO> findAllStudentDTOByRole(@Param("role") ERole role);
@@ -37,13 +38,13 @@ public interface StudentUserRepository extends JpaRepository<User, Long> {
                         select
                         new com.kaitech.student_crm.dtos.StudentDTO(
                         u.id,
-                        u.firstname,
-                        u.lastname,
+                        u.firstName,
+                        u.lastName,
                         u.email,
                         u.phoneNumber
                         )
-                        from User  u
-                        where u.direction.id = :directorId
+                        from Student  u
+                        where u.user.direction.id = :directorId
                         order by u.id
             """)
     List<StudentDTO> findAllByDirectorId(@Param("directorId") Long directorId);

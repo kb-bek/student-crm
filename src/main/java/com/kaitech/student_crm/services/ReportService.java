@@ -34,7 +34,7 @@ public class ReportService {
 
     public ReportDTO createReport(CreateReportDTO createReportDTO) {
         Report report = new Report();
-        report.setUser(studentUserService.getStudentById(createReportDTO.getUserId()));
+        report.setStudent(studentUserService.getStudentById(createReportDTO.getUserId()));
         report.setActivity(activityService.findById(createReportDTO.getActivityId()).orElseThrow(() -> new ActivityNotFoundException("Activity not found with id " + createReportDTO.getActivityId())));
         report.setWeeksday(weeksdayService.getWeeksdayById(createReportDTO.getWeeksdayId()));
         report.setDone(createReportDTO.isDone());
@@ -59,6 +59,6 @@ public class ReportService {
     }
 
     private ReportDTO convertToReportDTO(Report report) {
-        return modelMapper.map(report,  ReportDTO.class);
+        return modelMapper.map(report, ReportDTO.class);
     }
 }

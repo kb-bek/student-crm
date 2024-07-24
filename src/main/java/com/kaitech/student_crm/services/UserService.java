@@ -4,7 +4,7 @@ package com.kaitech.student_crm.services;
 import com.kaitech.student_crm.dtos.UserDTO;
 import com.kaitech.student_crm.exceptions.UserExistException;
 import com.kaitech.student_crm.models.User;
-import com.kaitech.student_crm.models.roles.ERole;
+import com.kaitech.student_crm.models.enums.ERole;
 import com.kaitech.student_crm.payload.request.SignUpRequest;
 import com.kaitech.student_crm.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -34,12 +34,10 @@ public class UserService {
         newUser.setEmail(user.getEmail());
         newUser.setFirstname(user.getFirstname());
         newUser.setLastname(user.getLastname());
-        newUser.setUsername(user.getUsername());
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        // изменил роль из админа на роль студента//
-        newUser.getRoles().add(ERole.ROlE_STUDENT);
+        newUser.setRole(ERole.ROLE_ADMIN);
 
-        if(userRepository.existsByUsername(user.getUsername())){
+        if(userRepository.findUserByEmail(user.getEmail()).isPresent()){
             throw new RuntimeException("Username must be unique");
         }
         if(!user.getPassword().equals(user.getConfirmPassword())){
@@ -69,7 +67,7 @@ public class UserService {
 
     private User getUserByPrincipal(Principal principal) {
         String username = principal.getName();
-        return userRepository.findUserByUsername(username)
+        return userRepository.findUserByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found with username " + username));
     }
 

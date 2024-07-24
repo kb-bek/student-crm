@@ -3,6 +3,7 @@ package com.kaitech.student_crm.services;
 import com.kaitech.student_crm.dtos.DirectionDTO;
 import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
 import com.kaitech.student_crm.models.Direction;
+import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.repositories.DirectionRepository;
@@ -36,11 +37,11 @@ public class DirectionService {
 
     public Direction assignStudentToDirection(Long directionId, Long studentId) {
         Optional<Direction> optionalDirection = directionRepository.findById(directionId);
-        Optional<User> optionalStudent = studentUserRepository.findById(studentId);
+        Optional<Student> optionalStudent = studentUserRepository.findById(studentId);
 
         if (optionalDirection.isPresent() && optionalStudent.isPresent()) {
             Direction direction = optionalDirection.get();
-            User student = optionalStudent.get();
+            Student student = optionalStudent.get();
 
 
             student.setDirection(direction);
