@@ -1,11 +1,11 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
-import com.kaitech.student_crm.dtos.UserDTO;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.exceptions.UserExistException;
+import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
-import com.kaitech.student_crm.models.roles.ERole;
+import com.kaitech.student_crm.models.enums.ERole;
 import com.kaitech.student_crm.payload.request.StudentDataRequest;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import org.slf4j.Logger;
@@ -29,31 +29,30 @@ public class StudentUserService {
     }
 
 
-    public User createStudent(StudentDataRequest student) {
-        User newStudent = new User();
+    public Student createStudent(StudentDataRequest student) {
+        Student newStudent = new Student();
 
-        newStudent.setFirstname(student.getFirstname());
-        newStudent.setLastname(student.getLastname());
+        newStudent.setLastName(student.getFirstname());
+        newStudent.setFirstName(student.getLastname());
         newStudent.setEmail(student.getEmail());
         newStudent.setPhoneNumber(student.getPhoneNumber());
-        newStudent.getRoles().add(ERole.ROlE_STUDENT);
 
         try {
             LOGGER.info("Saving Student {}", student.getEmail());
             return studentUserRepository.save(newStudent);
         } catch (Exception e) {
             LOGGER.error("Error during registration, {}", e.getMessage());
-            throw new UserExistException("The student " + newStudent.getFirstname() + " " + newStudent.getLastname() + " already exist");
+            throw new UserExistException("The student " + newStudent.getFirstName() + " " + newStudent.getLastName() + " already exist");
         }
     }
 
-    public User updateStudent(Long studentId, StudentDTO updatedStudent) {
-        Optional<User> studentOptional = studentUserRepository.findById(studentId);
+    public Student updateStudent(Long studentId, StudentDTO updatedStudent) {
+        Optional<Student> studentOptional = studentUserRepository.findById(studentId);
 
         if (studentOptional.isPresent()) {
-            User student = studentOptional.get();
-            student.setFirstname(updatedStudent.getFirstname());
-            student.setLastname(updatedStudent.getLastname());
+            Student student = studentOptional.get();
+            student.setFirstName(updatedStudent.getFirstname());
+            student.setLastName(updatedStudent.getLastname());
             student.setEmail(updatedStudent.getEmail());
             student.setPhoneNumber(updatedStudent.getPhoneNumber());
             return studentUserRepository.save(student);
@@ -66,14 +65,14 @@ public class StudentUserService {
         return studentUserRepository.findAllStudentDTOByRole(ERole.ROlE_STUDENT);
     }
 
-    public User getStudentById(Long studentId) {
+    public Student getStudentById(Long studentId) {
         return studentUserRepository.findUserById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student cannot be found"));
     }
 
     @Transactional
     public void deleteStudent(Long studentId) {
-        User student = getStudentById(studentId);
+        Student student = getStudentById(studentId);
         studentUserRepository.delete(student);
     }
 

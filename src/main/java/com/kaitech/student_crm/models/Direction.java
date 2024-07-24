@@ -11,22 +11,21 @@ import java.util.List;
 @Entity
 @Table(name = "direction")
 public class Direction {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private String name;
+    @Column(length = 800)
+    private String description;
 
-    @OneToMany(mappedBy = "direction", cascade = CascadeType.ALL)
-    private List<User> students = new ArrayList<>();
+    @OneToMany(mappedBy = "direction")
+    private List<Student> students;
 
     public Direction() {
     }
 
-    public Direction(Long id, String name, List<User> students) {
+    public Direction(Long id, String name, List<Student> students) {
         this.id = id;
         this.name = name;
         this.students = students;
@@ -48,12 +47,19 @@ public class Direction {
         this.name = name;
     }
 
-    public List<User> getStudents() {
+    public List<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<User> students) {
+    public void setStudents(List<Student> students) {
         this.students = students;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

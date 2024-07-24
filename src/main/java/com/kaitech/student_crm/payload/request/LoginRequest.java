@@ -5,18 +5,18 @@ import jakarta.validation.constraints.NotEmpty;
 
 public class LoginRequest {
 
-    @NotEmpty(message = "Username cannot be empty")
-    private String username;
+    @NotEmpty(message = "Email cannot be empty")
+    private String email;
 
     @NotEmpty(message = "Password cannot be empty")
     private String password;
 
     public @NotEmpty(message = "Username cannot be empty") String getUsername() {
-        return username;
+        return email;
     }
 
-    public void setUsername(@NotEmpty(message = "Username cannot be empty") String username) {
-        this.username = username;
+    public void setUsername(@NotEmpty(message = "Username cannot be empty") String email) {
+        this.email = email;
     }
 
     public @NotEmpty(message = "Password cannot be empty") String getPassword() {
