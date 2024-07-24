@@ -28,22 +28,6 @@ public class Report {
     @Column(nullable = false)
     private boolean isDone;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        isDone = done;
-    }
-
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
@@ -53,6 +37,7 @@ public class Report {
     public Report(Activity activity, Weeksday weeksday) {
         this.activity = activity;
         this.weeksday = weeksday;
+        this.isDone = isDone();
     }
 
     @PrePersist
@@ -63,7 +48,13 @@ public class Report {
     public Student getStudent() {
         return student;
     }
+    public boolean isDone() {
+        return isDone;
+    }
 
+    public void setDone(boolean done) {
+        isDone = done;
+    }
     public void setStudent(Student student) {
         this.student = student;
     }

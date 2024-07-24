@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface StudentUserRepository extends JpaRepository<Student, Long> {
     Optional<Student> findUserById(Long id);
 
+    boolean existsByUsername(String username);
+
     @Query("""
             select
             new com.kaitech.student_crm.dtos.StudentDTO(

@@ -36,7 +36,7 @@ public class SecurityConfig{
     private CustomUserDetailService customUserDetailService;
 
     @Autowired
-    private JWTAuthenticationFilter jwtAuthenticationFilter;
+    private  JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -37,6 +37,13 @@ public class UserService {
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         newUser.setRole(ERole.ROLE_ADMIN);
 
+        if(userRepository.findUserByEmail(user.getEmail()).isPresent()){
+            throw new RuntimeException("Username must be unique");
+        }
+        if(!user.getPassword().equals(user.getConfirmPassword())){
+            throw new RuntimeException("Password mismatch");
+        }
+
         try {
             LOGGER.info("Saving User {}", user.getEmail());
             return userRepository.save(newUser);

@@ -47,6 +47,9 @@ public class StudentController {
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
         return new ResponseEntity<>(studentUserService.getAllStudents(), HttpStatus.OK);
     }
+    
+
+
 
     @PostMapping("/new")
     public ResponseEntity<Object> addStudent(@Valid @RequestBody StudentDataRequest studentDataRequest,

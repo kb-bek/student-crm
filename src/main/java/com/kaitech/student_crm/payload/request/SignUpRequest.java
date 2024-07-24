@@ -1,11 +1,13 @@
 package com.kaitech.student_crm.payload.request;
 
+import com.kaitech.student_crm.annotations.PasswordMatches;
 import com.kaitech.student_crm.annotations.ValidEmail;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+@PasswordMatches
 public class SignUpRequest {
     @Email(message = "It should have email format")
     @NotBlank(message = "User email is required")
