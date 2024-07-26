@@ -21,16 +21,12 @@ public class JWTTokenProvider {
         Date now = new Date(System.currentTimeMillis());
         Date expiryDate = new Date(now.getTime() + SecurityConstants.EXPIRATION_TIME);
 
-        String userId = Long.toString(user.getId());
-
         Map<String, Object> claimsMap = new HashMap<>();
-        claimsMap.put("id", userId);
         claimsMap.put("username", user.getEmail());
         claimsMap.put("firstname", user.getFirstname());
         claimsMap.put("lastname", user.getLastname());
 
         return Jwts.builder()
-                .setSubject(userId)
                 .addClaims(claimsMap)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
@@ -57,15 +53,15 @@ public class JWTTokenProvider {
     }
 
 
-    public Long getUserIdFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(SecurityConstants.SECRET)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
-        String id = (String) claims.get("id");
+        String email = (String) claims.get("username");
 
-        return Long.parseLong(id);
+        return email;
     }
 }

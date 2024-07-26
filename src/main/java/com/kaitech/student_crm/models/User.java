@@ -42,11 +42,18 @@ public class User implements UserDetails {
     private Direction direction;
     @OneToOne(mappedBy = "user")
     private Student student;
+    private Integer code;
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
     public User() {
+    }
+
+    public User(String email, String password, ERole role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public User(Long id,
@@ -56,6 +63,17 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public User(String firstname, String lastname,
+                String email, String password,
+                ERole role, LocalDateTime createdDate) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.createdDate = createdDate;
     }
 
     @PrePersist
@@ -170,5 +188,12 @@ public class User implements UserDetails {
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 }

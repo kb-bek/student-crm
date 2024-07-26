@@ -12,6 +12,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String image;
     private String firstName;
     private String lastName;
     @Column(unique = true)
@@ -19,6 +20,7 @@ public class Student {
     @Column(unique = true)
     private String phoneNumber;
     private boolean registered = false;
+    private Integer code;
     @Enumerated(EnumType.STRING)
     private Status status;
     @OneToOne
@@ -133,5 +135,21 @@ public class Student {
 
     public void setReports(List<Report> reports) {
         this.reports = reports;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 }
