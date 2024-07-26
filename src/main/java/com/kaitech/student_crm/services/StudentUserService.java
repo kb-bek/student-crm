@@ -12,6 +12,7 @@ import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.repositories.DirectionRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import com.kaitech.student_crm.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,5 +142,36 @@ public class StudentUserService {
         student.setUser(user);
         studentUserRepository.save(student);
         return findById(student.getId());
+    }
+
+
+    @Transactional
+    public Student updateStudentStatus(Long id, Status newStatus) {
+        try {
+            LOGGER.info("Попытка обновить статус студента с ID: {}", id);
+
+            Student student = getStudentById(id);
+
+            LOGGER.debug("Текущий статус: {}, Новый статус: {}", student.getStatus(), newStatus);
+
+            student.setStatus(newStatus);
+            Student updatedStudent = studentUserRepository.save(student);
+
+            LOGGER.info("Статус студента с ID: {} успешно обновлён", id);
+
+            return updatedStudent;
+
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, e);
+            throw e;
+
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Ошибка обновления статуса: Недопустимый аргумент для студента с ID: {}", id, e);
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Непредвиденная ошибка при обновлении статуса студента с ID: {}", id, e);
+            throw new RuntimeException("Не удалось обновить статус студента из-за непредвиденной ошибки.", e);
+        }
     }
 }

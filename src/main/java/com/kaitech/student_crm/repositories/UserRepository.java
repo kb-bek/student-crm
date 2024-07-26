@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+
+
+
     @Query("""
             select new com.kaitech.student_crm.dtos.UserResponse(
             u.id,

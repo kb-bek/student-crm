@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-public class JWTAuthenticationFilter extends OncePerRequestFilter {
+public class
+JWTAuthenticationFilter extends OncePerRequestFilter {
     public static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     @Autowired
