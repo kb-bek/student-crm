@@ -20,8 +20,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                     p.projectType
                 )
                 from Project p
+                order by p.id
             """)
-    List<ProjectResponse> getAll();
+    List<ProjectResponse> findAllResponse();
 
     @Query("""
             select new com.kaitech.student_crm.payload.response.ProjectResponse(
@@ -30,21 +31,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             p.description,
             p.projectType
             )
-            from Project p 
-                where p.id = :projectId
+            from Project p
+            where p.id = :projectId
             """)
-    ProjectResponse findProjectResponseById(@Param("projectId") Long projectId);
-
-
-    @Query("""
-            SELECT new com.kaitech.student_crm.payload.response.ProjectResponse(
-                p.id,
-                p.title,
-                p.description,
-                p.projectType
-                )
-                    from Project p
-                    where p.id = :id """)
-    ProjectResponse findByIdResponse(@Param(value = "id") Long id);
-
+    ProjectResponse findByIdResponse(@Param("projectId") Long projectId);
 }

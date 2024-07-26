@@ -2,10 +2,8 @@ package com.kaitech.student_crm.repositories;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Student;
-import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
 import com.kaitech.student_crm.payload.response.StudentResponse;
-import com.kaitech.student_crm.payload.response.StudentProjectResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -55,6 +53,22 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
     List<StudentDTO> findAllByDirectorId(@Param("directorId") Long directorId);
 
     @Query("""
+                        select
+                        new com.kaitech.student_crm.payload.response.StudentResponse(
+                        st.id,
+                        st.image,
+                        st.firstName,
+                        st.lastName,
+                        st.email
+                        )
+                        from Project pr
+                        join pr.students st
+                        where pr.id = :projectId
+                        order by st.id
+            """)
+    List<StudentResponse> findAllByProjectIdResponse(@Param("projectId") Long projectId);
+
+    @Query("""
             select new com.kaitech.student_crm.payload.response.StudentResponse(
             s.id,
             s.image,
@@ -85,21 +99,16 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
     List<StudentResponse> findAllResponse();
 
     @Query("""
-    select new com.kaitech.student_crm.payload.response.StudentProjectResponse(
-    s.id,
-    s.image,
-    s.firstName,
-    s.lastName,
-    s.email
-    )
-    from Student s 
-    join s.projects pr 
-    where pr.id = :projectId
-""")
-    List<StudentProjectResponse> findAllByProjectId(@Param(value = "projectId")Long projectId);
-
-    @Modifying
-    @Query("DELETE FROM Student sp WHERE sp.projects = :projectId")
-    void deleteStudentProjectsByProjectId(@Param("projectId") Long projectId);
-
+                select new com.kaitech.student_crm.payload.response.StudentResponse(
+                s.id,
+                s.image,
+                s.firstName,
+                s.lastName,
+                s.email
+                )
+                from Student s
+                join s.projects pr
+                where pr.id = :projectId
+            """)
+    List<StudentResponse> findAllByProjectId(@Param(value = "projectId") Long projectId);
 }

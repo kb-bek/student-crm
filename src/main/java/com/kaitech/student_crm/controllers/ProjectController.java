@@ -56,7 +56,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "Добавление студента в проект")
-    @PostMapping("/{projectId}/students/{studentId}")
+    @PostMapping("add/student/{projectId}/{studentId}")
     public ProjectResponse addStudentToProject(@PathVariable Long projectId,
                                                @PathVariable Long studentId) {
         return projectService.addStudentToProject(projectId, studentId);
@@ -65,9 +65,15 @@ public class ProjectController {
     @Operation(summary = "Удаление студента из проекта")
     @DeleteMapping("/{projectId}/students/{studentId}")
     public ResponseEntity<HttpStatus> removeStudentFromProject(@PathVariable Long projectId,
-                                                    @PathVariable Long studentId) {
+                                                               @PathVariable Long studentId) {
         projectService.removeStudentFromProject(projectId, studentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Добавляет много студентов")
+    @PutMapping("add/students/{projectId}")
+    public ProjectResponse saveAllStudent(@PathVariable Long projectId,
+                                          @RequestParam List<Long> studentIds) {
+        return projectService.saveAllStudentInProject(projectId, studentIds);
+    }
 }

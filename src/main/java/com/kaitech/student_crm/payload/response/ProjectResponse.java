@@ -10,7 +10,7 @@ public class ProjectResponse {
     private String title;
     private String description;
     private ProjectType projectType;
-    private List<StudentProjectResponse> students;
+    private List<StudentResponse> students;
 
     public ProjectResponse(){}
 
@@ -21,7 +21,7 @@ public class ProjectResponse {
         this.projectType = projectType;
     }
 
-    public ProjectResponse(Long id, String title, String description, ProjectType projectType, List<StudentProjectResponse> students) {
+    public ProjectResponse(Long id, String title, String description, ProjectType projectType, List<StudentResponse> students) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -61,11 +61,11 @@ public class ProjectResponse {
         this.projectType = projectType;
     }
 
-    public List<StudentProjectResponse> getStudents() {
+    public List<StudentResponse> getStudents() {
         return students;
     }
 
-    public void setStudents(List<StudentProjectResponse> students) {
+    public void setStudents(List<StudentResponse> students) {
         this.students = students;
     }
 }

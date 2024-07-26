@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Student {
@@ -33,7 +34,7 @@ public class Student {
     @JoinColumn(name = "level_id")
     private Level level;
     @ManyToMany(mappedBy = "students")
-    private List<Project> projects;
+    private Set<Project> projects;
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Report> reports;
 
@@ -117,11 +118,11 @@ public class Student {
         this.level = level;
     }
 
-    public List<Project> getProjects() {
+    public Set<Project> getProjects() {
         return projects;
     }
 
-    public void setProjects(List<Project> projects) {
+    public void setProjects(Set<Project> projects) {
         this.projects = projects;
     }
 

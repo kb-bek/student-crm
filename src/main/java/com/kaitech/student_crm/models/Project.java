@@ -3,7 +3,10 @@ package com.kaitech.student_crm.models;
 import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Project {
@@ -20,9 +23,7 @@ public class Project {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    private List<Student> students;
-
-
+    private Set<Student> students = new HashSet<>();
 
 
     public Long getId() {
@@ -57,11 +58,11 @@ public class Project {
         this.projectType = projectType;
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students;
     }
 }
