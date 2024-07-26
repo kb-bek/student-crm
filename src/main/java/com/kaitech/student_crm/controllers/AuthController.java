@@ -29,37 +29,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
 public class AuthController {
-    @Autowired
-    private JWTTokenProvider jwtTokenProvider;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
     @Autowired
     private UserService userService;
 
-    @PostMapping("/signin")
-    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        ));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JWTTokenSuccessResponse(true, jwt));
+    @PostMapping("/sign/in")
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        return userService.signIn(loginRequest);
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) return errors;
-
-        userService.createUser(signUpRequest);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+    @PostMapping("/sign/up")
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        return userService.createUser(signUpRequest);
     }
 
     @GetMapping("get/code/reset/password/{email}")

@@ -6,16 +6,25 @@ import com.kaitech.student_crm.dtos.UserResponse;
 import com.kaitech.student_crm.exceptions.UserExistException;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
+import com.kaitech.student_crm.payload.request.LoginRequest;
 import com.kaitech.student_crm.payload.request.SignUpRequest;
+import com.kaitech.student_crm.payload.response.JWTTokenSuccessResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.repositories.UserRepository;
+import com.kaitech.student_crm.security.JWTTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +41,10 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private JWTTokenProvider jwtTokenProvider;
+    @Autowired
+    private AuthenticationManager authenticationManager;
     @Value("${linkReset}")
     private String linkForReset;
 
@@ -41,6 +54,20 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.javaMailSender = javaMailSender;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public ResponseEntity<Object> signIn(LoginRequest loginRequest) {
+        if (userRepository.findUserByEmail(loginRequest.getEmail()).isEmpty())
+            return new ResponseEntity<>(new MessageResponse("Email not found"), HttpStatus.BAD_REQUEST);
+        if (!passwordEncoder.matches(loginRequest.getPassword(), userRepository.findUserByEmail(loginRequest.getEmail()).get().getPassword()))
+            return new ResponseEntity<>(new MessageResponse("Incorrect password"), HttpStatus.BAD_REQUEST);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        ));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtTokenProvider.generateToken(authentication);
+        return ResponseEntity.ok(new JWTTokenSuccessResponse(true, jwt));
     }
 
     public UserResponse newPassword(String email,
@@ -75,28 +102,25 @@ public class UserService {
         return new MessageResponse("The link has been sent to your email.");
     }
 
-    public User createUser(SignUpRequest user) {
+    public ResponseEntity<Object> createUser(SignUpRequest user) {
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setFirstname(user.getFirstname());
         newUser.setLastname(user.getLastname());
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         newUser.setRole(ERole.ROLE_ADMIN);
-
-        if (userRepository.findUserByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Username must be unique");
-        }
-        if (!user.getPassword().equals(user.getConfirmPassword())) {
-            throw new RuntimeException("Password mismatch");
-        }
-
+        if (userRepository.findUserByEmail(user.getEmail()).isPresent())
+            return new ResponseEntity<>(new MessageResponse("Email found. Email must be unique"), HttpStatus.BAD_REQUEST);
+        if (!user.getPassword().equals(user.getConfirmPassword()))
+            return new ResponseEntity<>(new MessageResponse("Password mismatch"), HttpStatus.BAD_REQUEST);
         try {
             LOGGER.info("Saving User {}", user.getEmail());
-            return userRepository.save(newUser);
+            userRepository.save(newUser);
         } catch (Exception e) {
             LOGGER.error("Error during registration, {}", e.getMessage());
-            throw new UserExistException("The user " + newUser.getUsername() + " already exist");
+            return new ResponseEntity<>(new MessageResponse("The user " + newUser.getUsername() + " already exist"), HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(userRepository.findByIdResponse(newUser.getId()), HttpStatus.OK);
     }
 
     public User updateUser(UserDTO userDTO, Principal principal) {

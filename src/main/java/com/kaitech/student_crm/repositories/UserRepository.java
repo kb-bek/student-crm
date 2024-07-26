@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             u.email
             )
             from User u
-            where u.id = :id        
+            where u.id = :id
             """)
     UserResponse findByIdResponse(@Param(value = "id") Long id);
 }
