@@ -1,30 +1,33 @@
-package com.kaitech.student_crm.models;
+package com.kaitech.student_crm.payload.response;
 
 import com.kaitech.student_crm.models.enums.ProjectType;
-import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@Entity
-public class Project {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ProjectResponse {
+
     private Long id;
     private String title;
     private String description;
-    @Enumerated(EnumType.STRING)
     private ProjectType projectType;
-    @ManyToMany
-    @JoinTable(
-            name = "projects_students",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
-    private Set<Student> students = new HashSet<>();
+    private List<StudentResponse> students;
 
+    public ProjectResponse(){}
+
+    public ProjectResponse(Long id, String title, String description, ProjectType projectType) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.projectType = projectType;
+    }
+
+    public ProjectResponse(Long id, String title, String description, ProjectType projectType, List<StudentResponse> students) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.projectType = projectType;
+        this.students = students;
+    }
 
     public Long getId() {
         return id;
@@ -58,11 +61,11 @@ public class Project {
         this.projectType = projectType;
     }
 
-    public Set<Student> getStudents() {
+    public List<StudentResponse> getStudents() {
         return students;
     }
 
-    public void setStudents(Set<Student> students) {
+    public void setStudents(List<StudentResponse> students) {
         this.students = students;
     }
 }

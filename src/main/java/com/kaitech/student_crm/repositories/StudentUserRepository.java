@@ -2,10 +2,10 @@ package com.kaitech.student_crm.repositories;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Student;
-import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
 import com.kaitech.student_crm.payload.response.StudentResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -47,10 +47,26 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
                         u.phoneNumber
                         )
                         from Student  u
-                        where u.user.direction.id = :directorId
+                        where u.direction.id = :directorId
                         order by u.id
             """)
     List<StudentDTO> findAllByDirectorId(@Param("directorId") Long directorId);
+
+    @Query("""
+                        select
+                        new com.kaitech.student_crm.payload.response.StudentResponse(
+                        st.id,
+                        st.image,
+                        st.firstName,
+                        st.lastName,
+                        st.email
+                        )
+                        from Project pr
+                        join pr.students st
+                        where pr.id = :projectId
+                        order by st.id
+            """)
+    List<StudentResponse> findAllByProjectIdResponse(@Param("projectId") Long projectId);
 
     @Query("""
             select new com.kaitech.student_crm.payload.response.StudentResponse(
@@ -81,4 +97,18 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
             order by s.id
             """)
     List<StudentResponse> findAllResponse();
+
+    @Query("""
+                select new com.kaitech.student_crm.payload.response.StudentResponse(
+                s.id,
+                s.image,
+                s.firstName,
+                s.lastName,
+                s.email
+                )
+                from Student s
+                join s.projects pr
+                where pr.id = :projectId
+            """)
+    List<StudentResponse> findAllByProjectId(@Param(value = "projectId") Long projectId);
 }
