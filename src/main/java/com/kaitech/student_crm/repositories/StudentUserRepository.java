@@ -4,6 +4,7 @@ import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
+import com.kaitech.student_crm.payload.response.StudentResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +18,9 @@ import java.util.Optional;
 public interface StudentUserRepository extends JpaRepository<Student, Long> {
     Optional<Student> findUserById(Long id);
 
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+
+    Optional<Student> findByEmail(String email);
 
     @Query("""
             select
@@ -48,4 +51,34 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
                         order by u.id
             """)
     List<StudentDTO> findAllByDirectorId(@Param("directorId") Long directorId);
+
+    @Query("""
+            select new com.kaitech.student_crm.payload.response.StudentResponse(
+            s.id,
+            s.image,
+            s.firstName,
+            s.lastName,
+            s.email,
+            s.phoneNumber,
+            s.direction.name,
+            s.status
+            )from Student s
+            where s.id = :studentId
+            """)
+    StudentResponse findByIdResponse(@Param(value = "studentId") Long studentId);
+
+    @Query("""
+            select new com.kaitech.student_crm.payload.response.StudentResponse(
+            s.id,
+            s.image,
+            s.firstName,
+            s.lastName,
+            s.email,
+            s.phoneNumber,
+            s.direction.name,
+            s.status
+            )from Student s
+            order by s.id
+            """)
+    List<StudentResponse> findAllResponse();
 }

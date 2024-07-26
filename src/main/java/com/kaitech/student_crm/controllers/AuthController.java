@@ -1,10 +1,12 @@
 package com.kaitech.student_crm.controllers;
 
 
+import com.kaitech.student_crm.dtos.UserResponse;
 import com.kaitech.student_crm.payload.request.LoginRequest;
 import com.kaitech.student_crm.payload.request.SignUpRequest;
 import com.kaitech.student_crm.payload.response.JWTTokenSuccessResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
+import com.kaitech.student_crm.repositories.UserRepository;
 import com.kaitech.student_crm.security.JWTTokenProvider;
 import com.kaitech.student_crm.security.SecurityConstants;
 import com.kaitech.student_crm.services.UserService;
@@ -37,13 +39,13 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/signin")
-    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult){
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) {
             return errors;
         }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
+                loginRequest.getEmail(),
                 loginRequest.getPassword()
         ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -58,5 +60,17 @@ public class AuthController {
 
         userService.createUser(signUpRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+    }
+
+    @GetMapping("get/code/reset/password/{email}")
+    public MessageResponse resetCode(@PathVariable String email) {
+        return userService.resetPassword(email);
+    }
+
+    @PutMapping("reset/password/{email}/{code}")
+    public UserResponse resetPassword(@PathVariable String email,
+                                      @PathVariable Integer code,
+                                      @RequestParam String password) {
+        return userService.newPassword(email, code, password);
     }
 }
