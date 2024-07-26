@@ -3,17 +3,24 @@ package com.kaitech.student_crm.controllers;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
+import com.kaitech.student_crm.models.enums.Status;
 import com.kaitech.student_crm.payload.request.StudentDataRequest;
 import com.kaitech.student_crm.payload.response.MessageResponse;
+import com.kaitech.student_crm.payload.response.StudentResponse;
+import com.kaitech.student_crm.repositories.StudentUserRepository;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.validations.ResponseErrorValidation;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/student")
+@Validated
 public class StudentController {
 
     private final StudentUserService studentUserService;
@@ -44,22 +52,17 @@ public class StudentController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<StudentDTO>> getAllStudents() {
+    public ResponseEntity<List<StudentResponse>> getAllStudents() {
         return new ResponseEntity<>(studentUserService.getAllStudents(), HttpStatus.OK);
     }
-    
 
-
-    @PostMapping("/new")
-    public ResponseEntity<Object> addStudent(@Valid @RequestBody StudentDataRequest studentDataRequest,
-                                             BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
-
-        studentUserService.createStudent(studentDataRequest);
-        return ResponseEntity.ok(new MessageResponse("Student added successfully"));
+    @PostMapping("/add/intern/{directionId}")
+    @Operation(method = "Method for adding new interns", description = "Can only be used ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public StudentResponse addStudent(@Valid @RequestBody StudentDataRequest studentDataRequest,
+                                      @RequestParam Status status,
+                                      @PathVariable Long directionId) {
+        return studentUserService.createStudent(studentDataRequest, status, directionId);
     }
 
     @PostMapping("/{id}/delete")
@@ -80,7 +83,6 @@ public class StudentController {
 
         return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
     }
-
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);

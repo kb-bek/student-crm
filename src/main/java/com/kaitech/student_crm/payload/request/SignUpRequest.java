@@ -20,9 +20,6 @@ public class SignUpRequest {
     @NotEmpty(message = "Please enter your lastname")
     private String lastname;
 
-    @NotEmpty(message = "Please enter your username")
-    private String username;
-
     @NotEmpty(message = "Password is required")
     @Size(min = 8)
     private String password;
@@ -51,14 +48,6 @@ public class SignUpRequest {
 
     public void setLastname(@NotEmpty(message = "Please enter your lastname") String lastname) {
         this.lastname = lastname;
-    }
-
-    public @NotEmpty(message = "Please enter your username") String getUsername() {
-        return username;
-    }
-
-    public void setUsername(@NotEmpty(message = "Please enter your username") String username) {
-        this.username = username;
     }
 
     public @NotEmpty(message = "Password is required") @Size(min = 8) String getPassword() {

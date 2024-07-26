@@ -1,11 +1,14 @@
 package com.kaitech.student_crm.payload.request;
 
 import com.kaitech.student_crm.annotations.ValidEmail;
+import com.kaitech.student_crm.models.enums.Status;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 public class StudentDataRequest {
+    @NotEmpty(message = "Please enter student's image")
+    private String image;
     @Email(message = "It should have email format")
     @NotBlank(message = "Student email is required")
     @ValidEmail
@@ -18,28 +21,6 @@ public class StudentDataRequest {
 
     @NotEmpty(message = "Please enter student's phone number")
     private String phoneNumber;
-
-    @NotEmpty
-    private String password;
-
-    @NotEmpty
-    private String confirmPassword;
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
 
     public @Email(message = "It should have email format") @NotBlank(message = "Student email is required") String getEmail() {
         return email;
@@ -71,5 +52,13 @@ public class StudentDataRequest {
 
     public void setPhoneNumber(@NotEmpty(message = "Please enter student's phone number") String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

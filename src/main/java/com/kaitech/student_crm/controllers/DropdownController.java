@@ -6,6 +6,7 @@ import com.kaitech.student_crm.dtos.WeeksdayDTO;
 import com.kaitech.student_crm.models.Activity;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.Weeksday;
+import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.services.ActivityService;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.services.WeeksdayService;
@@ -38,7 +39,7 @@ public class DropdownController {
 
 
     @GetMapping("/students")
-    public List<StudentDTO> getAllStudents() {
+    public List<StudentResponse> getAllStudents() {
         return studentUserService.getAllStudents();
     }
 

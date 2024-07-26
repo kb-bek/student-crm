@@ -29,7 +29,6 @@ public class CustomUserDetailService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found with username: " + username));
 
         return new User(
-                user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole());

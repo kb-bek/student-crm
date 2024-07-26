@@ -1,10 +1,12 @@
 package com.kaitech.student_crm.controllers;
 
 
+import com.kaitech.student_crm.dtos.UserResponse;
 import com.kaitech.student_crm.payload.request.LoginRequest;
 import com.kaitech.student_crm.payload.request.SignUpRequest;
 import com.kaitech.student_crm.payload.response.JWTTokenSuccessResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
+import com.kaitech.student_crm.repositories.UserRepository;
 import com.kaitech.student_crm.security.JWTTokenProvider;
 import com.kaitech.student_crm.security.SecurityConstants;
 import com.kaitech.student_crm.services.UserService;
@@ -27,36 +29,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
 public class AuthController {
-    @Autowired
-    private JWTTokenProvider jwtTokenProvider;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
     @Autowired
     private UserService userService;
 
-    @PostMapping("/signin")
-    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult){
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        ));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JWTTokenSuccessResponse(true, jwt));
+    @PostMapping("/sign/in")
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        return userService.signIn(loginRequest);
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) return errors;
+    @PostMapping("/sign/up")
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        return userService.createUser(signUpRequest);
+    }
 
-        userService.createUser(signUpRequest);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+    @GetMapping("get/code/reset/password/{email}")
+    public MessageResponse resetCode(@PathVariable String email) {
+        return userService.resetPassword(email);
+    }
+
+    @PutMapping("reset/password/{email}/{code}")
+    public UserResponse resetPassword(@PathVariable String email,
+                                      @PathVariable Integer code,
+                                      @RequestParam String password) {
+        return userService.newPassword(email, code, password);
     }
 }
