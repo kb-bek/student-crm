@@ -84,6 +84,13 @@ public class StudentController {
         return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
     }
 
+    @Operation(summary = "Изменение статуса стажера")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/students/{id}/status")
+    public Student updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
+        return studentUserService.updateStudentStatus(id, status);
+    }
+
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);
     }
@@ -91,4 +98,7 @@ public class StudentController {
     private User convertToStudent(StudentDTO studentDTO) {
         return modelMapper.map(studentDTO, User.class);
     }
+
+
+
 }

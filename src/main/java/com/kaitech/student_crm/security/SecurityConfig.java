@@ -51,13 +51,6 @@ public class SecurityConfig{
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SecurityConstants.SIGN_UP_URLS, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2Login ->
-                        oauth2Login
-                                .defaultSuccessUrl("/auth2", true)
-                                .userInfoEndpoint(userInfo -> userInfo
-                                        .userService(oAuth2UserService())
-                                )
 
                 );
 
