@@ -14,6 +14,7 @@ import java.util.*;
 @Table(name = "\"user\"")
 public class User implements UserDetails {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +24,7 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String lastname;
+    private  String username;
 
     @Column(unique = true)
     private String email;
@@ -54,9 +56,11 @@ public class User implements UserDetails {
     }
 
     public User(Long id,
+                String username,
                 String email, String password,
                 ERole role) {
         this.id = id;
+        this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -71,6 +75,12 @@ public class User implements UserDetails {
         this.password = password;
         this.role = role;
         this.createdDate = createdDate;
+    }
+
+    public User(String email, String name) {
+    }
+
+    public User(Long id, String email, String password, ERole role) {
     }
 
     @PrePersist
