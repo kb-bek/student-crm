@@ -37,8 +37,8 @@ public class StudentUserService {
         newStudent.setEmail(student.getEmail());
         newStudent.setPhoneNumber(student.getPhoneNumber());
 
-        if(studentUserRepository.existsByUsername(student.getUsername())){
-            throw new RuntimeException("Username must be unique");
+        if(studentUserRepository.existsByEmail(student.getEmail())){
+            throw new RuntimeException("Email must be unique");
         }
 
         if(!student.getConfirmPassword().equals(student.getPassword())){

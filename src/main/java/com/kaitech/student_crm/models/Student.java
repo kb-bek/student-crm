@@ -12,6 +12,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private  String image;
     private String firstName;
     private String lastName;
     @Column(unique = true)
@@ -30,11 +31,7 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "level_id")
     private Level level;
-    @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
-    )
+    @ManyToMany(mappedBy = "students")
     private List<Project> projects;
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Report> reports;
@@ -45,6 +42,14 @@ public class Student {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getFirstName() {

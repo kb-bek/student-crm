@@ -11,11 +11,11 @@ public class LoginRequest {
     @NotEmpty(message = "Password cannot be empty")
     private String password;
 
-    public @NotEmpty(message = "Username cannot be empty") String getUsername() {
+    public @NotEmpty(message = "Username cannot be empty") String getEmail() {
         return email;
     }
 
-    public void setUsername(@NotEmpty(message = "Username cannot be empty") String email) {
+    public void setEmail(@NotEmpty(message = "Username cannot be empty") String email) {
         this.email = email;
     }
 

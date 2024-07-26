@@ -50,7 +50,6 @@ public class StudentController {
     
 
 
-
     @PostMapping("/new")
     public ResponseEntity<Object> addStudent(@Valid @RequestBody StudentDataRequest studentDataRequest,
                                              BindingResult bindingResult) {

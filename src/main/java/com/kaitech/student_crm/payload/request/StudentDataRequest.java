@@ -10,18 +10,6 @@ public class StudentDataRequest {
     @NotBlank(message = "Student email is required")
     @ValidEmail
     private String email;
-
-    @NotEmpty
-    private String username;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @NotEmpty(message = "Please enter student's name")
     private String firstname;
 

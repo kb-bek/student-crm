@@ -43,7 +43,7 @@ public class AuthController {
             return errors;
         }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
+                loginRequest.getEmail(),
                 loginRequest.getPassword()
         ));
         SecurityContextHolder.getContext().setAuthentication(authentication);

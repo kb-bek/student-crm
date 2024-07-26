@@ -37,9 +37,6 @@ public class User implements UserDetails {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    @ManyToOne
-    @JoinColumn(name = "direction_id")
-    private Direction direction;
     @OneToOne(mappedBy = "user")
     private Student student;
 
@@ -116,14 +113,6 @@ public class User implements UserDetails {
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
         this.authorities = authorities;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
     }
 
     @Override

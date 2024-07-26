@@ -1,29 +1,22 @@
-package com.kaitech.student_crm.models;
+package com.kaitech.student_crm.dtos;
 
+import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.enums.ProjectType;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
-@Entity
-public class Project {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ProjectDTO {
     private Long id;
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String description;
-    @Enumerated(EnumType.STRING)
+
+    @NotEmpty
     private ProjectType projectType;
-    @ManyToMany
-    @JoinTable(
-            name = "projects_students",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
+
     private List<Student> students;
-
-
-
 
     public Long getId() {
         return id;

@@ -4,7 +4,9 @@ import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
+import com.kaitech.student_crm.payload.response.StudentProjectResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,7 +19,7 @@ import java.util.Optional;
 public interface StudentUserRepository extends JpaRepository<Student, Long> {
     Optional<Student> findUserById(Long id);
 
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 
     @Query("""
             select
@@ -44,8 +46,27 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
                         u.phoneNumber
                         )
                         from Student  u
-                        where u.user.direction.id = :directorId
+                        where u.direction.id = :directorId
                         order by u.id
             """)
     List<StudentDTO> findAllByDirectorId(@Param("directorId") Long directorId);
+
+    @Query("""
+    select new com.kaitech.student_crm.payload.response.StudentProjectResponse(
+    s.id,
+    s.image,
+    s.firstName,
+    s.lastName,
+    s.email
+    )
+    from Student s 
+    join s.projects pr 
+    where pr.id = :projectId
+""")
+    List<StudentProjectResponse> findAllByProjectId(@Param(value = "projectId")Long projectId);
+
+    @Modifying
+    @Query("DELETE FROM Student sp WHERE sp.projects = :projectId")
+    void deleteStudentProjectsByProjectId(@Param("projectId") Long projectId);
+
 }
