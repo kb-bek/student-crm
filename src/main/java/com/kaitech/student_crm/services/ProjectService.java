@@ -83,6 +83,8 @@ public class ProjectService {
         projectResponse.setTitle(projectRequest.getTitle());
         projectResponse.setDescription(projectRequest.getDescription());
         projectResponse.setProjectType(projectRequest.getProjectType());
+        projectResponse.setStartDate(projectRequest.getStartDate());
+        projectResponse.setEndDate(projectRequest.getEndDate());
         projectRepository.save(convertToProject(projectResponse));
         return findByIdResponse(projectResponse.getId());
     }

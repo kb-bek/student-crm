@@ -2,7 +2,7 @@ package com.kaitech.student_crm.payload.response;
 
 import com.kaitech.student_crm.models.enums.ProjectType;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ProjectResponse {
@@ -12,12 +12,12 @@ public class ProjectResponse {
     private String description;
     private ProjectType projectType;
     private List<StudentResponse> students;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public ProjectResponse(){}
 
-    public ProjectResponse(Long id, String title, String description, ProjectType projectType, LocalDateTime startDate, LocalDateTime endDate) {
+    public ProjectResponse(Long id, String title, String description, ProjectType projectType, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -74,19 +74,19 @@ public class ProjectResponse {
         this.students = students;
     }
 
-    public LocalDateTime getEndDate() {
-        return endDate;
+    public LocalDate getEndDate(LocalDate endDate) {
+        return this.endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 }

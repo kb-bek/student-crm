@@ -4,6 +4,7 @@ import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.*;
 import org.modelmapper.internal.bytebuddy.asm.Advice;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,8 +28,8 @@ public class Project {
     )
     private Set<Student> students = new HashSet<>();
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
 
     public Long getId() {
@@ -71,19 +72,19 @@ public class Project {
         this.students = students;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 }
