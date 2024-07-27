@@ -1,15 +1,20 @@
 package com.kaitech.student_crm.services;
 
+import com.kaitech.student_crm.exceptions.ProjectNotFoundException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.ProjectRequest;
+import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ProjectResponse;
 import com.kaitech.student_crm.repositories.ProjectRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
 
@@ -39,6 +44,11 @@ public class ProjectService {
 
     public ProjectResponse getProjectById(Long id) {
         ProjectResponse projectResponse = projectRepository.findByIdResponse(id);
+
+        if (projectResponse == null) {
+            throw new ProjectNotFoundException("Project with id " + id + " not found");
+        }
+
         projectResponse.setStudents(studentUserRepository.findAllByProjectIdResponse(id));
         return projectResponse;
     }
@@ -63,6 +73,11 @@ public class ProjectService {
 
     public ProjectResponse updateProject(Long id, ProjectRequest projectRequest) {
         ProjectResponse projectResponse = getProjectById(id);
+
+        if (projectResponse == null) {
+            throw new ProjectNotFoundException("Project with id " + id + " not found");
+        }
+
         projectResponse.setTitle(projectRequest.getTitle());
         projectResponse.setDescription(projectRequest.getDescription());
         projectResponse.setProjectType(projectRequest.getProjectType());
@@ -72,11 +87,16 @@ public class ProjectService {
 
     public void deleteProject(Long id) {
         ProjectResponse projectResponse = getProjectById(id);
+
+        if (projectResponse == null) {
+            throw new ProjectNotFoundException("Project with id " + id + " not found");
+        }
         projectRepository.delete(convertToProject(projectResponse));
     }
 
     public ProjectResponse addStudentToProject(Long projectId, Long studentId) {
-        Project project = projectRepository.findById(projectId).orElseThrow();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ProjectNotFoundException("Project this id " + projectId + " not found"));
         Student student = studentUserRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found"));
         project.getStudents().add(student);
@@ -87,7 +107,8 @@ public class ProjectService {
     }
 
     public void removeStudentFromProject(Long projectId, Long studentId) {
-        Project project = projectRepository.findById(projectId).orElseThrow();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ProjectNotFoundException("Project this id " + projectId + " not found"));
         Student student = studentUserRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found"));
         project.getStudents().remove(student);
@@ -102,4 +123,6 @@ public class ProjectService {
     public Project convertToProject(ProjectResponse projectResponse) {
         return modelMapper.map(projectResponse, Project.class);
     }
+
+
 }
