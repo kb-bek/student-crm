@@ -17,7 +17,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                     p.id,
                     p.title,
                     p.description,
-                    p.projectType
+                    p.projectType,
+                    p.startDate,
+                    p.endDate
                 )
                 from Project p
                 order by p.id
@@ -29,7 +31,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             p.id,
             p.title,
             p.description,
-            p.projectType
+            p.projectType,
+            p.startDate,
+            p.endDate
             )
             from Project p
             where p.id = :projectId

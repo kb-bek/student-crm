@@ -65,6 +65,8 @@ public class ProjectService {
         newProject.setTitle(projectRequest.getTitle());
         newProject.setDescription(projectRequest.getDescription());
         newProject.setProjectType(projectRequest.getProjectType());
+        newProject.setStartDate(projectRequest.getStartDate());
+        newProject.setEndDate(projectRequest.getEndDate());
         newProject.getStudents().addAll(studentUserRepository.findAllById(studentIds));
         projectRepository.save(newProject);
         return findByIdResponse(newProject.getId());

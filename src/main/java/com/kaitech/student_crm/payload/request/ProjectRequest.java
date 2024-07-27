@@ -5,6 +5,7 @@ import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProjectRequest {
@@ -18,6 +19,9 @@ public class ProjectRequest {
 
     @NotEmpty
     private ProjectType projectType;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     public String getTitle() {
         return title;
@@ -42,4 +46,19 @@ public class ProjectRequest {
         this.projectType = projectType;
     }
 
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
 }
