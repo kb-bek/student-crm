@@ -53,17 +53,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public User(Long id,
-                String username,
-                String email, String password,
-                ERole role) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
     public User(String firstname, String lastname,
                 String email, String password,
                 ERole role, LocalDateTime createdDate) {
