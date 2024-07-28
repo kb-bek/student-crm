@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.repositories;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.enums.ERole;
 import com.kaitech.student_crm.payload.response.StudentResponse;
@@ -97,6 +98,20 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
             order by s.id
             """)
     List<StudentResponse> findAllResponse();
+
+    @Query("""
+            select new com.kaitech.student_crm.dtos.StudentDTOForAll(
+            s.id,
+            s.image,
+            s.lastName,
+            s.firstName,
+            s.direction.name,
+            s.status
+            ) from Student s
+            order by s.id
+            """)
+    List<StudentDTOForAll> findAllStudentDTOs();
+
 
     @Query("""
                 select new com.kaitech.student_crm.payload.response.StudentResponse(

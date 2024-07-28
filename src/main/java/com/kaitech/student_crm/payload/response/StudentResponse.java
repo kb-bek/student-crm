@@ -14,4 +14,5 @@ public record StudentResponse(
     public StudentResponse(Long id, String image, String firstName, String lastName, String email) {
         this(id, image, firstName, lastName, email, null, null, null);
     }
+
 }
