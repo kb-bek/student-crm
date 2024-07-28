@@ -15,8 +15,6 @@ public class Level {
     private Integer pointTo;
     @Column(length = 900)
     private String description;
-    @OneToMany(mappedBy = "level")
-    private List<Student> students;
 
     public Level(String title, Integer pointFrom, Integer pointTo, String description) {
         this.title = title;
@@ -66,13 +64,5 @@ public class Level {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
     }
 }

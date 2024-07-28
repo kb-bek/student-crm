@@ -51,8 +51,27 @@ public class LevelController {
                     title должен быть уникален.           \s
                     """)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> create(@RequestBody LevelRequest request) {
+    public ResponseEntity<LevelResponse> create(@RequestBody LevelRequest request) {
         return ResponseEntity.ok(levelService.createLevel(request));
+    }
+
+    @PutMapping("update/level/{levelId}")
+    @Operation(summary = "Обновляет level, его может использовать только ROLE_ADMIN",
+            description = """
+                    pointFrom должен быть меньше чем pointTo,
+                    pointFrom и pointTo не должны пересекаться с другими баллами уровней,
+                    title должен быть уникален.           \s
+                    """)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> update(@RequestBody LevelRequest request,
+                                    @PathVariable Long levelId) {
+        return ResponseEntity.ok(levelService.updateLevel(request, levelId));
+    }
+
+    @DeleteMapping("delete/by/{levelId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<LevelResponse>> deleteById(@PathVariable Long levelId) {
+        return ResponseEntity.ok(levelService.deleteById(levelId));
     }
 
     @ExceptionHandler(LevelBadRequest.class)
@@ -65,5 +84,11 @@ public class LevelController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     private ResponseEntity<MessageResponse> handleLevelNotFound(LevelNotFound e) {
         return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    private ResponseEntity<MessageResponse> handleLevelNotFound(RuntimeException e) {
+        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -51,5 +51,10 @@ public interface LevelRepository extends JpaRepository<Level, Long> {
     @Query("select concat('[title: ', l.title, ', pointFrom: ', l.pointFrom, ', pointTo: ', l.pointTo, ']') from Level l where :points between l.pointFrom and (l.pointTo-1)")
     List<String> checkPoints(@Param(value = "points") Integer points);
 
+    @Query("select concat('[title: ', l.title, ', pointFrom: ', l.pointFrom, ', pointTo: ', l.pointTo, ']') from Level l where :points between l.pointFrom and (l.pointTo-1) and not l.id = :levelId")
+    List<String> checkPoints(@Param(value = "points") Integer points, @Param(value = "levelId") Long levelId);
+
     boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Long levelId);
 }
