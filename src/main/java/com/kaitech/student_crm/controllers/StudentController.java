@@ -4,6 +4,7 @@ import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
+import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;
@@ -47,11 +48,10 @@ public class StudentController {
         this.responseErrorValidation = responseErrorValidation;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id) {
+    @GetMapping("/{studentId}")
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long studentId) {
         try {
-            StudentDTO studentDTO = studentUserService.findStudentById(id);
-            return new ResponseEntity<>(studentDTO, HttpStatus.OK);
+            return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -107,6 +107,13 @@ public class StudentController {
         return studentUserService.updateStudentStatus(id, status);
     }
 
+    @PutMapping("add/point/student/by/{studentId}")
+    @Operation(summary = "Добавляет студенту баллы и при помощи этого он получает уровень, этот метод может использовать только ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<StudentDTO> addPointStudent(@PathVariable Long studentId,
+                                                      @RequestParam Integer point) {
+        return ResponseEntity.ok(studentUserService.addPointForStudent(studentId, point));
+    }
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);
@@ -114,5 +121,11 @@ public class StudentController {
 
     private User convertToStudent(StudentDTO studentDTO) {
         return modelMapper.map(studentDTO, User.class);
+    }
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private ResponseEntity<MessageResponse> handleLevelNotFound(StudentNotFoundException e) {
+        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

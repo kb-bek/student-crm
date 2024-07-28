@@ -5,6 +5,7 @@ import com.kaitech.student_crm.payload.response.ProjectResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,4 +40,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             where p.id = :projectId
             """)
     ProjectResponse findByIdResponse(@Param("projectId") Long projectId);
+
+    @Query("select p.title from Project p join p.students s on s.id = :studentId")
+    List<String> findTitlesByStudentId(@Param(value = "studentId") Long studentId);
 }

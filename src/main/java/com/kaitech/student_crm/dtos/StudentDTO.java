@@ -19,13 +19,17 @@ public class StudentDTO {
     private String direction;
     private List<String> projects;
     private Status status;
+    private String level;
+    private Integer point;
 
     public StudentDTO() {
     }
 
 
-
-    public StudentDTO(Long id,String image, String firstname, String lastname, String email, String phoneNumber, String direction, List<String> projects, Status status) {
+    public StudentDTO(Long id, String image, String firstname,
+                      String lastname, String email, String phoneNumber,
+                      String direction, Status status,
+                      String level, Integer point) {
         this.id = id;
         this.image = image;
         this.firstname = firstname;
@@ -33,8 +37,9 @@ public class StudentDTO {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.direction = direction;
-        this.projects = projects;
         this.status = status;
+        this.level = level;
+        this.point = point;
     }
 
     public StudentDTO(Long id, String firstName, String lastName, String email, String phoneNumber) {
@@ -88,6 +93,7 @@ public class StudentDTO {
     public void setPhoneNumber(@NotEmpty String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
     public String getDirection() {
         return direction;
     }
@@ -118,5 +124,21 @@ public class StudentDTO {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
     }
 }

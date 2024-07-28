@@ -13,6 +13,7 @@ import com.kaitech.student_crm.models.enums.Status;
 import com.kaitech.student_crm.payload.request.StudentDataRequest;
 import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.repositories.DirectionRepository;
+import com.kaitech.student_crm.repositories.ProjectRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import com.kaitech.student_crm.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,10 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,16 +41,18 @@ public class StudentUserService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProjectRepository projectRepository;
     @Value("${link}")
     private String link;
 
     @Autowired
-    public StudentUserService(StudentUserRepository studentUserRepository, DirectionRepository directionRepository, JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public StudentUserService(StudentUserRepository studentUserRepository, DirectionRepository directionRepository, JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder, ProjectRepository projectRepository) {
         this.studentUserRepository = studentUserRepository;
         this.directionRepository = directionRepository;
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.projectRepository = projectRepository;
     }
 
 
@@ -159,6 +159,15 @@ public class StudentUserService {
     @Transactional
     public void deleteStudent(Long studentId) {
         Student student = getStudentById(studentId);
+        Set<Project> projects = student.getProjects();
+        List<Project> updatedProjects = new ArrayList<>();
+        projects.forEach(
+                project -> {
+                    project.getStudents().remove(student);
+                    updatedProjects.add(project);
+                }
+        );
+        projectRepository.saveAll(updatedProjects);
         studentUserRepository.delete(student);
     }
 
@@ -178,7 +187,7 @@ public class StudentUserService {
                 student.getLastName(),
                 student.getEmail(),
                 passwordEncoder.encode(password),
-                ERole.ROlE_STUDENT, LocalDateTime.now());
+                ERole.ROLE_STUDENT, LocalDateTime.now());
         userRepository.save(user);
         student.setCode(0);
         student.setRegistered(true);
@@ -225,5 +234,23 @@ public class StudentUserService {
             LOGGER.error("Непредвиденная ошибка при обновлении статуса студента с ID: {}", id, e);
             throw new RuntimeException("Не удалось обновить статус студента из-за непредвиденной ошибки.", e);
         }
+    }
+
+    public StudentDTO addPointForStudent(Long studentId, Integer point) {
+        Student student = studentUserRepository.findById(studentId).orElseThrow(
+                () -> new StudentNotFoundException("Not found student ID: " + studentId)
+        );
+        student.setPoint(point);
+        studentUserRepository.save(student);
+        return findByIdStudentInfo(studentId);
+    }
+
+    public StudentDTO findByIdStudentInfo(Long studentId) {
+        studentUserRepository.findById(studentId).orElseThrow(
+                () -> new StudentNotFoundException("Not found student ID: " + studentId)
+        );
+        StudentDTO dto = studentUserRepository.findByIdStudentDTO(studentId);
+        dto.setProjects(projectRepository.findTitlesByStudentId(studentId));
+        return dto;
     }
 }

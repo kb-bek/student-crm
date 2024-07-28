@@ -126,4 +126,22 @@ public interface StudentUserRepository extends JpaRepository<Student, Long> {
                 where pr.id = :projectId
             """)
     List<StudentResponse> findAllByProjectId(@Param(value = "projectId") Long projectId);
+
+    @Query("""
+            select new com.kaitech.student_crm.dtos.StudentDTO(
+            s.id,
+            s.image,
+            s.firstName,
+            s.lastName,
+            s.email,
+            s.phoneNumber,
+            s.direction.name,
+            s.status,
+            (select l.title from Level l where s.point between l.pointFrom and (l.pointTo-1)),
+            s.point
+            )
+            from Student s
+            where s.id = :studentId
+            """)
+    StudentDTO findByIdStudentDTO(@Param(value = "studentId") Long studentId);
 }
