@@ -2,7 +2,10 @@ package com.kaitech.student_crm.models;
 
 import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.*;
+import org.modelmapper.internal.bytebuddy.asm.Advice;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +27,9 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     private Set<Student> students = new HashSet<>();
+
+    private LocalDate startDate;
+    private LocalDate endDate;
 
 
     public Long getId() {
@@ -64,5 +70,21 @@ public class Project {
 
     public void setStudents(Set<Student> students) {
         this.students = students;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }
