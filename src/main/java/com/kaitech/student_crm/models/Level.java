@@ -11,12 +11,20 @@ public class Level {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private Integer pointsFrom;
-    private Integer pointsTo;
+    private Integer pointFrom;
+    private Integer pointTo;
     @Column(length = 900)
     private String description;
-    @OneToMany(mappedBy = "level")
-    private List<Student> students;
+
+    public Level(String title, Integer pointFrom, Integer pointTo, String description) {
+        this.title = title;
+        this.pointFrom = pointFrom;
+        this.pointTo = pointTo;
+        this.description = description;
+    }
+
+    public Level() {
+    }
 
     public Long getId() {
         return id;
@@ -34,20 +42,20 @@ public class Level {
         this.title = title;
     }
 
-    public Integer getPointsFrom() {
-        return pointsFrom;
+    public Integer getPointFrom() {
+        return pointFrom;
     }
 
-    public void setPointsFrom(Integer pointsFrom) {
-        this.pointsFrom = pointsFrom;
+    public void setPointFrom(Integer pointFrom) {
+        this.pointFrom = pointFrom;
     }
 
-    public Integer getPointsTo() {
-        return pointsTo;
+    public Integer getPointTo() {
+        return pointTo;
     }
 
-    public void setPointsTo(Integer pointsTo) {
-        this.pointsTo = pointsTo;
+    public void setPointTo(Integer pointTo) {
+        this.pointTo = pointTo;
     }
 
     public String getDescription() {
@@ -56,13 +64,5 @@ public class Level {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
     }
 }

@@ -115,7 +115,4 @@ public class StudentController {
     private User convertToStudent(StudentDTO studentDTO) {
         return modelMapper.map(studentDTO, User.class);
     }
-
-
-
 }
