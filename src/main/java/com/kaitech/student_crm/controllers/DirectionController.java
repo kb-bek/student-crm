@@ -5,9 +5,11 @@ import com.kaitech.student_crm.dtos.DirectionDTO;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.User;
+import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
 import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.services.DirectionService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,8 +44,8 @@ public class DirectionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<DirectionDTO> createDirection(@RequestBody DirectionDTO directionDTO) {
-        DirectionDTO createdDirection = directionService.createDirection(directionDTO);
+    public ResponseEntity<DirectionResponse> createDirection(@RequestBody @Valid DirectionCreateRequest directionCreateRequest) {
+        DirectionResponse createdDirection = directionService.createDirection(directionCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDirection);
     }
 

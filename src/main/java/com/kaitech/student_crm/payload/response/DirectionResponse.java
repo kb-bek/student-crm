@@ -1,7 +1,6 @@
 package com.kaitech.student_crm.payload.response;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
-import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.Column;
 
 import java.util.List;

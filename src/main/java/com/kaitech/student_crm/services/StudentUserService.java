@@ -209,7 +209,7 @@ public class StudentUserService {
                     updatedStudent.getLastName(),
                     updatedStudent.getEmail(),
                     updatedStudent.getPhoneNumber(),
-                    updatedStudent.getDirection().getName(),
+                    updatedStudent.getDirection().getName(), // Assuming Direction is an entity with a getName() method
                     updatedStudent.getStatus()
             );
 
@@ -226,5 +226,4 @@ public class StudentUserService {
             throw new RuntimeException("Не удалось обновить статус студента из-за непредвиденной ошибки.", e);
         }
     }
-
 }

@@ -36,4 +36,10 @@ public interface DirectionRepository extends JpaRepository<Direction, Long> {
     DirectionResponse findByIdDirectorResponse(@Param(value = "directorId") Long directorId);
 
     boolean existsByName(String name);
+
+
+    @Query("SELECT new com.kaitech.student_crm.payload.response.DirectionResponse" +
+            "(d.id, d.name, d.description) " +
+            "FROM Direction d")
+    List<DirectionResponse> findAllDirections();
 }

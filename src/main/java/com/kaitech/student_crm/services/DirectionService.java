@@ -5,6 +5,7 @@ import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
 import com.kaitech.student_crm.exceptions.ResourceNotFoundException;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.Student;
+import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
 import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.repositories.DirectionRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
@@ -31,27 +32,27 @@ public class DirectionService {
     }
 
 
-    public DirectionDTO createDirection(DirectionDTO directionDTO) {
+    public DirectionResponse createDirection(DirectionCreateRequest directionCreateRequest) {
         try {
-            if (directionDTO.getName() == null || directionDTO.getName().isEmpty()) {
+            if (directionCreateRequest.getName() == null || directionCreateRequest.getName().isEmpty()) {
                 throw new IllegalArgumentException("Поле имя не должно быть пустым");
             }
-            if (directionDTO.getDescription() == null || directionDTO.getDescription().isEmpty()) {
+            if (directionCreateRequest.getDescription() == null || directionCreateRequest.getDescription().isEmpty()) {
                 throw new IllegalArgumentException("Описание не должно быть пустым");
             }
 
-            if (directionRepository.existsByName(directionDTO.getName())) {
+            if (directionRepository.existsByName(directionCreateRequest.getName())) {
                 throw new IllegalArgumentException("Направление с таким именем уже существует");
             }
 
             Direction direction = new Direction();
-            direction.setName(directionDTO.getName());
-            direction.setDescription(directionDTO.getDescription());
+            direction.setName(directionCreateRequest.getName());
+            direction.setDescription(directionCreateRequest.getDescription());
 
             Direction savedDirection = directionRepository.save(direction);
 
-            DirectionDTO responseDTO = new DirectionDTO();
-            responseDTO.setId(savedDirection.getId());
+            DirectionResponse responseDTO = new DirectionResponse();
+            responseDTO.setId(savedDirection.getId()); // Устанавливаем id из сохраненного объекта
             responseDTO.setName(savedDirection.getName());
             responseDTO.setDescription(savedDirection.getDescription());
 
@@ -60,11 +61,13 @@ public class DirectionService {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (DataAccessException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurred", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Произошла ошибка базы данных", e);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Произошла неожиданная ошибка", e);
         }
     }
+
+
 
     public Direction assignStudentToDirection(Long directionId, Long studentId) {
         Optional<Direction> optionalDirection = directionRepository.findById(directionId);
@@ -101,18 +104,7 @@ public class DirectionService {
     }
 
     public List<DirectionResponse> getAllDirections() {
-        List<Direction> directions = directionRepository.findAll();
-
-        return directions.stream()
-                .map(direction -> {
-                    DirectionResponse response = new DirectionResponse();
-                    response.setId(direction.getId());
-                    response.setName(direction.getName());
-                    response.setDescription(direction.getDescription());
-
-                    return response;
-                })
-                .collect(Collectors.toList());
+        return directionRepository.findAllDirections();
     }
 
 
