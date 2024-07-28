@@ -1,6 +1,9 @@
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.dtos.StudentDTOForAll;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;
@@ -11,6 +14,7 @@ import com.kaitech.student_crm.repositories.StudentUserRepository;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.validations.ResponseErrorValidation;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +48,22 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudentDTO> getStudent(@PathVariable("id") String studentId) {
-        Student student = studentUserService.getStudentById(Long.parseLong(studentId));
-        StudentDTO studentDTO = convertToStudentDTO(student);
-        return new ResponseEntity<>(studentDTO, HttpStatus.OK);
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id) {
+        try {
+            StudentDTO studentDTO = studentUserService.findStudentById(id);
+            return new ResponseEntity<>(studentDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<StudentResponse>> getAllStudents() {
-        return new ResponseEntity<>(studentUserService.getAllStudents(), HttpStatus.OK);
+    public ResponseEntity<List<StudentDTOForAll>> getAllStudents() {
+        List<StudentDTOForAll> students = studentUserService.findAllStudents();
+        return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @PostMapping("/add/intern/{directionId}")
@@ -65,31 +75,38 @@ public class StudentController {
         return studentUserService.createStudent(studentDataRequest, status, directionId);
     }
 
-    @PostMapping("/{id}/delete")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<MessageResponse> deleteStudent(@PathVariable("id") String studentId) {
         studentUserService.deleteStudent(Long.parseLong(studentId));
         return new ResponseEntity<>(new MessageResponse("Student was deleted"), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<Object> updateStudent(@PathVariable("id") String studentId, @Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
+    public ResponseEntity<Object> updateStudent(
+            @PathVariable("id") String studentId,
+            @Valid @RequestBody StudentDTO studentDTO,
+            BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) {
             return errors;
         }
 
-        Student student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
-        StudentDTO updatedStudent = convertToStudentDTO(student);
-
-        return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        try {
+            Student student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
+            StudentDTO updatedStudent = convertToStudentDTO(student);
+            return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        } catch (EmailAlreadyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Operation(summary = "Изменение статуса стажера")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/students/{id}/status")
-    public Student updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
+    public StudentResponse updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
         return studentUserService.updateStudentStatus(id, status);
     }
+
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);

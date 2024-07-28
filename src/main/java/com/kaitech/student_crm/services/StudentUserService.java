@@ -1,8 +1,11 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.dtos.StudentDTOForAll;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.exceptions.UserExistException;
+import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.ERole;
@@ -29,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentUserService {
@@ -89,24 +93,63 @@ public class StudentUserService {
         return findById(newStudent.getId());
     }
 
-    public Student updateStudent(Long studentId, StudentDTO updatedStudent) {
+    public Student updateStudent(Long studentId, StudentDTO updatedStudentDTO) {
         Optional<Student> studentOptional = studentUserRepository.findById(studentId);
 
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
-            student.setFirstName(updatedStudent.getFirstname());
-            student.setLastName(updatedStudent.getLastname());
-            student.setEmail(updatedStudent.getEmail());
-            student.setPhoneNumber(updatedStudent.getPhoneNumber());
+
+            if (!student.getEmail().equals(updatedStudentDTO.getEmail())) {
+                boolean emailExists = studentUserRepository.existsByEmail(updatedStudentDTO.getEmail());
+                if (emailExists) {
+                    throw new EmailAlreadyExistsException("Email " + updatedStudentDTO.getEmail() + " is already in use");
+                }
+            }
+
+            student.setFirstName(updatedStudentDTO.getFirstname());
+            student.setLastName(updatedStudentDTO.getLastname());
+            student.setEmail(updatedStudentDTO.getEmail());
+            student.setPhoneNumber(updatedStudentDTO.getPhoneNumber());
             return studentUserRepository.save(student);
         } else {
             throw new UserExistException("Student not found with id - " + studentId);
         }
     }
 
+
     public List<StudentResponse> getAllStudents() {
         return studentUserRepository.findAllResponse();
     }
+
+    public List<StudentDTOForAll> findAllStudents() {
+        return studentUserRepository.findAllStudentDTOs();
+    }
+
+
+    public StudentDTO findStudentById(Long studentId) {
+        Student student = studentUserRepository.findById(studentId)
+                .orElseThrow(() -> new EntityNotFoundException("Стажер с ID: " + studentId + "не найден"));
+
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setImage(student.getImage());
+        studentDTO.setFirstname(student.getFirstName());
+        studentDTO.setLastname(student.getLastName());
+        studentDTO.setEmail(student.getEmail());
+        studentDTO.setPhoneNumber(student.getPhoneNumber());
+        studentDTO.setStatus(student.getStatus());
+
+        if (student.getDirection() != null) {
+            studentDTO.setDirection(student.getDirection().getName());
+        }
+
+        List<String> projectNames = student.getProjects().stream()
+                .map(Project::getTitle)
+                .collect(Collectors.toList());
+        studentDTO.setProjects(projectNames);
+
+        return studentDTO;
+    }
+
 
     public Student getStudentById(Long studentId) {
         return studentUserRepository.findUserById(studentId)
@@ -146,7 +189,7 @@ public class StudentUserService {
 
 
     @Transactional
-    public Student updateStudentStatus(Long id, Status newStatus) {
+    public StudentResponse updateStudentStatus(Long id, Status newStatus) {
         try {
             LOGGER.info("Попытка обновить статус студента с ID: {}", id);
 
@@ -159,7 +202,16 @@ public class StudentUserService {
 
             LOGGER.info("Статус студента с ID: {} успешно обновлён", id);
 
-            return updatedStudent;
+            return new StudentResponse(
+                    updatedStudent.getId(),
+                    updatedStudent.getImage(),
+                    updatedStudent.getFirstName(),
+                    updatedStudent.getLastName(),
+                    updatedStudent.getEmail(),
+                    updatedStudent.getPhoneNumber(),
+                    updatedStudent.getDirection().getName(), // Assuming Direction is an entity with a getName() method
+                    updatedStudent.getStatus()
+            );
 
         } catch (EntityNotFoundException e) {
             LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, e);
