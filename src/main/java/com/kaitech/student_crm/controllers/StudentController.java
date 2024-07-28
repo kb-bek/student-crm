@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
