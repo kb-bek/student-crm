@@ -69,6 +69,7 @@ public class LevelController {
     }
 
     @DeleteMapping("delete/by/{levelId}")
+    @Operation(summary = "Удаляет level, его может использовать только ROLE_ADMIN")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<LevelResponse>> deleteById(@PathVariable Long levelId) {
         return ResponseEntity.ok(levelService.deleteById(levelId));
