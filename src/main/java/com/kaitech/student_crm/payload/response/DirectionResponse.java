@@ -1,16 +1,22 @@
 package com.kaitech.student_crm.payload.response;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import jakarta.persistence.Column;
 
 import java.util.List;
 
 public class DirectionResponse {
     private Long id;
     private String name;
+    @Column(length = 800)
+    private String description;
+
     private List<StudentDTO> students;
 
-
-    public DirectionResponse() {
+    public DirectionResponse(Long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
     }
 
     public DirectionResponse(Long id, String name) {
@@ -24,6 +30,10 @@ public class DirectionResponse {
         this.students = students;
     }
 
+    public DirectionResponse() {
+
+    }
+
     public Long getId() {
         return id;
     }
@@ -34,6 +44,14 @@ public class DirectionResponse {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setName(String name) {
