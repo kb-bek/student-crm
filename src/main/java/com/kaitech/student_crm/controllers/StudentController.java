@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;
@@ -72,24 +73,31 @@ public class StudentController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<Object> updateStudent(@PathVariable("id") String studentId, @Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
+    public ResponseEntity<Object> updateStudent(
+            @PathVariable("id") String studentId,
+            @Valid @RequestBody StudentDTO studentDTO,
+            BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) {
             return errors;
         }
 
-        Student student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
-        StudentDTO updatedStudent = convertToStudentDTO(student);
-
-        return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        try {
+            Student student = studentUserService.updateStudent(Long.parseLong(studentId), studentDTO);
+            StudentDTO updatedStudent = convertToStudentDTO(student);
+            return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        } catch (EmailAlreadyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Operation(summary = "Изменение статуса стажера")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/students/{id}/status")
-    public Student updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
+    public StudentResponse updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
         return studentUserService.updateStudentStatus(id, status);
     }
+
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);

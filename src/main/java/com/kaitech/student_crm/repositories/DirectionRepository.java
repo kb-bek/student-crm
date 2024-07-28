@@ -16,12 +16,14 @@ public interface DirectionRepository extends JpaRepository<Direction, Long> {
     @Query("""
             select new com.kaitech.student_crm.payload.response.DirectionResponse(
             d.id,
-            d.name
+            d.name,
+            d.description
             )
             from Direction d
             order by d.id
             """)
     List<DirectionResponse> findAllDirectorResponse();
+
 
     @Query("""
             select new com.kaitech.student_crm.payload.response.DirectionResponse(
@@ -32,4 +34,6 @@ public interface DirectionRepository extends JpaRepository<Direction, Long> {
             where d.id = :directorId
             """)
     DirectionResponse findByIdDirectorResponse(@Param(value = "directorId") Long directorId);
+
+    boolean existsByName(String name);
 }
