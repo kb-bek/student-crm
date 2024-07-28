@@ -176,7 +176,7 @@ public class StudentUserService {
                     updatedStudent.getLastName(),
                     updatedStudent.getEmail(),
                     updatedStudent.getPhoneNumber(),
-                    updatedStudent.getDirection().getName(), // Assuming Direction is an entity with a getName() method
+                    updatedStudent.getDirection().getName(),
                     updatedStudent.getStatus()
             );
 
