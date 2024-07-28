@@ -7,16 +7,14 @@ import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.payload.response.DirectionResponse;
 import com.kaitech.student_crm.payload.response.MessageResponse;
-import com.kaitech.student_crm.repositories.DirectionRepository;
 import com.kaitech.student_crm.services.DirectionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/directions")
@@ -29,24 +27,24 @@ public class DirectionController {
 
     @GetMapping("/all")
     public ResponseEntity<List<DirectionResponse>> getAllDirectionsWithStudents() {
-        List<DirectionResponse> directions = directionService.findAllResponse();
+        List<DirectionResponse> directions = directionService.getAllDirections();
         if (directions.isEmpty())
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok(directions);
     }
 
-    @GetMapping("/{directorId}")
-    public ResponseEntity<DirectionResponse> getDirectorWithStudents(@PathVariable Long directorId) {
-        DirectionResponse response = directionService.findByIdResponse(directorId);
+    @GetMapping("/{directionId}")
+    public ResponseEntity<DirectionResponse> getDirectorWithStudents(@PathVariable Long directionId) {
+        DirectionResponse response = directionService.getById(directionId);
         if (response == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createDirection(@RequestBody DirectionCreateRequest request) {
-        Direction direction = directionService.createDirection(request.getName());
-        return ResponseEntity.ok(direction);
+    public ResponseEntity<DirectionDTO> createDirection(@RequestBody DirectionDTO directionDTO) {
+        DirectionDTO createdDirection = directionService.createDirection(directionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDirection);
     }
 
     @PutMapping("/{directionId}/assignStudent/{studentId}")

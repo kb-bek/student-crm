@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.exceptions.UserExistException;
 import com.kaitech.student_crm.models.Student;
@@ -89,20 +90,29 @@ public class StudentUserService {
         return findById(newStudent.getId());
     }
 
-    public Student updateStudent(Long studentId, StudentDTO updatedStudent) {
+    public Student updateStudent(Long studentId, StudentDTO updatedStudentDTO) {
         Optional<Student> studentOptional = studentUserRepository.findById(studentId);
 
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
-            student.setFirstName(updatedStudent.getFirstname());
-            student.setLastName(updatedStudent.getLastname());
-            student.setEmail(updatedStudent.getEmail());
-            student.setPhoneNumber(updatedStudent.getPhoneNumber());
+
+            if (!student.getEmail().equals(updatedStudentDTO.getEmail())) {
+                boolean emailExists = studentUserRepository.existsByEmail(updatedStudentDTO.getEmail());
+                if (emailExists) {
+                    throw new EmailAlreadyExistsException("Email " + updatedStudentDTO.getEmail() + " is already in use");
+                }
+            }
+
+            student.setFirstName(updatedStudentDTO.getFirstname());
+            student.setLastName(updatedStudentDTO.getLastname());
+            student.setEmail(updatedStudentDTO.getEmail());
+            student.setPhoneNumber(updatedStudentDTO.getPhoneNumber());
             return studentUserRepository.save(student);
         } else {
             throw new UserExistException("Student not found with id - " + studentId);
         }
     }
+
 
     public List<StudentResponse> getAllStudents() {
         return studentUserRepository.findAllResponse();
@@ -146,7 +156,7 @@ public class StudentUserService {
 
 
     @Transactional
-    public Student updateStudentStatus(Long id, Status newStatus) {
+    public StudentResponse updateStudentStatus(Long id, Status newStatus) {
         try {
             LOGGER.info("Попытка обновить статус студента с ID: {}", id);
 
@@ -159,7 +169,16 @@ public class StudentUserService {
 
             LOGGER.info("Статус студента с ID: {} успешно обновлён", id);
 
-            return updatedStudent;
+            return new StudentResponse(
+                    updatedStudent.getId(),
+                    updatedStudent.getImage(),
+                    updatedStudent.getFirstName(),
+                    updatedStudent.getLastName(),
+                    updatedStudent.getEmail(),
+                    updatedStudent.getPhoneNumber(),
+                    updatedStudent.getDirection().getName(), // Assuming Direction is an entity with a getName() method
+                    updatedStudent.getStatus()
+            );
 
         } catch (EntityNotFoundException e) {
             LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, e);
@@ -174,4 +193,5 @@ public class StudentUserService {
             throw new RuntimeException("Не удалось обновить статус студента из-за непредвиденной ошибки.", e);
         }
     }
+
 }
