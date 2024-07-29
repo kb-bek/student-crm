@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/report")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ReportController {
 
     private final ReportService reportService;
@@ -40,6 +42,7 @@ public class ReportController {
     }
 
     @Operation(summary = "Создать новый отчет")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<Object> createReport(@Valid @RequestBody CreateReportDTO createReportDTO, BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
@@ -52,6 +55,7 @@ public class ReportController {
 
 
     @Operation(summary = "Получить отчет по ID")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ReportResponseDTO> getReportById(@PathVariable Long id) {
         Optional<ReportResponseDTO> reportDTO = reportService.getReportById(id);
@@ -61,6 +65,7 @@ public class ReportController {
 
     @Operation(summary = "Получить все отчеты")
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public ResponseEntity<List<ReportResponseDTO>> getAllReports() {
         List<ReportResponseDTO> reports = reportService.getAllReports();
         return ResponseEntity.ok(reports);
@@ -68,6 +73,7 @@ public class ReportController {
 
 
     @Operation(summary = "Удалить отчет")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(
             @Parameter(description = "ID отчета", required = true) @PathVariable Long id) {

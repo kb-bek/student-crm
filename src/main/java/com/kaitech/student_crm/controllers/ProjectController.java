@@ -13,12 +13,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/project")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ProjectController {
 
     @Autowired
@@ -26,11 +28,13 @@ public class ProjectController {
 
     @Operation(summary = "Вывод всех проектов")
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public List<ProjectResponse> getAllProjects() {
         return projectService.getAllProjects();
     }
 
     @Operation(summary = "Вывод проекта по id")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ProjectResponse getProjectById(@PathVariable Long id) {
         return projectService.getProjectById(id);
@@ -38,6 +42,7 @@ public class ProjectController {
 
     @Operation(summary = "Создание нового проекта")
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProjectResponse createProject(
             @RequestBody ProjectRequest projectRequest,
             @RequestParam(defaultValue = "") List<Long> studIds) {
@@ -46,12 +51,14 @@ public class ProjectController {
     }
 
     @Operation(summary = "Изменение проекта")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ProjectResponse updateProject(@PathVariable Long id, @RequestBody ProjectRequest projectRequest) {
         return projectService.updateProject(id, projectRequest);
     }
 
     @Operation(summary = "Удаление проекта")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
@@ -59,6 +66,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "Добавление студента в проект")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("add/student/{projectId}/{studentId}")
     public ProjectResponse addStudentToProject(@PathVariable Long projectId,
                                                @PathVariable Long studentId) {
@@ -66,6 +74,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "Удаление студента из проекта")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{projectId}/students/{studentId}")
     public ResponseEntity<HttpStatus> removeStudentFromProject(@PathVariable Long projectId,
                                                                @PathVariable Long studentId) {
@@ -74,6 +83,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "Добавляет много студентов")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("add/students/{projectId}")
     public ProjectResponse saveAllStudent(@PathVariable Long projectId,
                                           @RequestParam List<Long> studentIds) {

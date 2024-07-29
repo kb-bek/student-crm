@@ -44,6 +44,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public ResponseEntity<StudentDTO> getStudent(@PathVariable("id") String studentId) {
         Student student = studentUserService.getStudentById(Long.parseLong(studentId));
         StudentDTO studentDTO = convertToStudentDTO(student);
@@ -66,12 +67,14 @@ public class StudentController {
     }
 
     @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteStudent(@PathVariable("id") String studentId) {
         studentUserService.deleteStudent(Long.parseLong(studentId));
         return new ResponseEntity<>(new MessageResponse("Student was deleted"), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> updateStudent(@PathVariable("id") String studentId, @Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) {

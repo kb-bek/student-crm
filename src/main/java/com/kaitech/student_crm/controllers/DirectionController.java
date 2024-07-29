@@ -12,6 +12,7 @@ import com.kaitech.student_crm.services.DirectionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/directions")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class DirectionController {
 
     @Autowired
@@ -28,6 +30,7 @@ public class DirectionController {
     private ModelMapper modelMapper;
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public ResponseEntity<List<DirectionResponse>> getAllDirectionsWithStudents() {
         List<DirectionResponse> directions = directionService.findAllResponse();
         if (directions.isEmpty())

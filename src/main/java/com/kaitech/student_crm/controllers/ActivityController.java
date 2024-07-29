@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/activity")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ActivityController {
 
     @Autowired
@@ -31,18 +33,21 @@ public class ActivityController {
 
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public List<Activity> getAllActivity(){
         return activityService.findAll();
     }
 
     // Метод для вывода Activity по id
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public Optional<Activity> getTaskById(@PathVariable Long id) {
         return activityService.findById(id);
     }
 
     // Метод для создания Activity
     @PostMapping("/new")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpStatus> createActivity(@RequestBody @Valid ActivityDTO activityDTO,
                                                      BindingResult bindingResult){
 
@@ -66,6 +71,7 @@ public class ActivityController {
 
     // Метод для обновления Activity
     @PutMapping("/{id}/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpStatus> updateActivity(@PathVariable Long id, @RequestBody @Valid ActivityDTO activityDTO,
                                                      BindingResult result) {
         if (result.hasErrors()) {
@@ -87,6 +93,7 @@ public class ActivityController {
 
     // Метод для удаления Activity
     @DeleteMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpStatus> deleteActivity(@PathVariable Long id) {
         activityService.deleteActivity(id);
         return ResponseEntity.ok(HttpStatus.OK);
