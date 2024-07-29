@@ -39,6 +39,7 @@ public class DirectionController {
     }
 
     @GetMapping("/{directionId}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public ResponseEntity<DirectionResponse> getDirectorWithStudents(@PathVariable Long directionId) {
         DirectionResponse response = directionService.getById(directionId);
         if (response == null)
@@ -47,12 +48,14 @@ public class DirectionController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<DirectionResponse> createDirection(@RequestBody @Valid DirectionCreateRequest directionCreateRequest) {
         DirectionResponse createdDirection = directionService.createDirection(directionCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDirection);
     }
 
     @PutMapping("/{directionId}/assignStudent/{studentId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> assignStudentToDirection(
             @PathVariable Long directionId,
             @PathVariable Long studentId
@@ -62,6 +65,7 @@ public class DirectionController {
     }
 
     @DeleteMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteDirection(@PathVariable Long id) {
         directionService.deleteDirection(id);
         return ResponseEntity.ok(new MessageResponse("Direction was deleted"));
