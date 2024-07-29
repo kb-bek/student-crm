@@ -34,6 +34,7 @@ public class Student {
     private Set<Project> projects;
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Report> reports;
+    private Integer point;
 
     public Long getId() {
         return id;
@@ -137,5 +138,13 @@ public class Student {
 
     public void setCode(Integer code) {
         this.code = code;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
     }
 }

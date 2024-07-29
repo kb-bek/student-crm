@@ -3,14 +3,13 @@ package com.kaitech.student_crm.controllers;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
-import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
+import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;
 import com.kaitech.student_crm.payload.request.StudentDataRequest;
 import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.StudentResponse;
-import com.kaitech.student_crm.repositories.StudentUserRepository;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.validations.ResponseErrorValidation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +19,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
@@ -28,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -47,11 +44,10 @@ public class StudentController {
         this.responseErrorValidation = responseErrorValidation;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id) {
+    @GetMapping("/{studentId}")
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long studentId) {
         try {
-            StudentDTO studentDTO = studentUserService.findStudentById(id);
-            return new ResponseEntity<>(studentDTO, HttpStatus.OK);
+            return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -107,6 +103,13 @@ public class StudentController {
         return studentUserService.updateStudentStatus(id, status);
     }
 
+    @PutMapping("add/point/student/by/{studentId}")
+    @Operation(summary = "Добавляет студенту баллы и при помощи этого он получает уровень, этот метод может использовать только ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<StudentDTO> addPointStudent(@PathVariable Long studentId,
+                                                      @RequestParam Integer point) {
+        return ResponseEntity.ok(studentUserService.addPointForStudent(studentId, point));
+    }
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);
@@ -114,5 +117,11 @@ public class StudentController {
 
     private User convertToStudent(StudentDTO studentDTO) {
         return modelMapper.map(studentDTO, User.class);
+    }
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private ResponseEntity<MessageResponse> handleLevelNotFound(StudentNotFoundException e) {
+        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }
