@@ -26,12 +26,14 @@ public class LevelController {
     }
 
     @GetMapping("find/by/id/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @Operation(summary = "возвращает level по ID")
     public LevelResponse findById(@PathVariable Long id) {
         return levelService.findById(id);
     }
 
     @GetMapping("find/by/title/{title}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @Operation(summary = "возвращает level по title")
     public LevelResponse findByTitle(@PathVariable String title) {
         return levelService.findByTitle(title);

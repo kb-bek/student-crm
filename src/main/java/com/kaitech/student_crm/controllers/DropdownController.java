@@ -12,6 +12,7 @@ import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.services.WeeksdayService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,11 +40,13 @@ public class DropdownController {
 
 
     @GetMapping("/students")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public List<StudentResponse> getAllStudents() {
         return studentUserService.getAllStudents();
     }
 
     @GetMapping("/activities")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public List<ActivityDTO> getAllActivities() {
         List<Activity> activities = activityService.findAll();
 
@@ -54,6 +57,7 @@ public class DropdownController {
     }
 
     @GetMapping("/weeksdays")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     public List<WeeksdayDTO> getAllWeeksdays() {
         List<Weeksday> weeksdays = weeksdayService.getAllWeeksdays();
         return weeksdays.stream()
