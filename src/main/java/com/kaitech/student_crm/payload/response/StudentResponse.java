@@ -2,6 +2,9 @@ package com.kaitech.student_crm.payload.response;
 
 import com.kaitech.student_crm.models.enums.Status;
 
+
+import java.util.List;
+
 public record StudentResponse(Long id,
                               String image,
                               String firstName,
@@ -9,8 +12,16 @@ public record StudentResponse(Long id,
                               String email,
                               String phoneNumber,
                               String direction,
-                              Status status) {
+                              List<ProjectResponse> projects,
+                              Status status,
+                              LevelResponse level) {
+
     public StudentResponse(Long id, String image, String firstName, String lastName, String email) {
-        this(id, image, firstName, lastName, email, null, null, null);
+        this(id, image, firstName, lastName, email, null, null, null, null, null);
     }
+
+    public StudentResponse(Long id, String image, String firstName, String lastName, String email, String phoneNumber, String direction, Status status) {
+        this(id, image, firstName, lastName, email, phoneNumber, direction, null, status, null);
+    }
+
 }

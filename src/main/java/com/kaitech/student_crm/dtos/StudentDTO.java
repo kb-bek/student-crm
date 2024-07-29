@@ -1,9 +1,13 @@
 package com.kaitech.student_crm.dtos;
 
+import com.kaitech.student_crm.models.enums.Status;
 import jakarta.validation.constraints.NotEmpty;
+
+import java.util.List;
 
 public class StudentDTO {
     private Long id;
+    private String image;
     @NotEmpty
     private String firstname;
     @NotEmpty
@@ -12,14 +16,31 @@ public class StudentDTO {
     private String email;
     @NotEmpty
     private String phoneNumber;
+    private String direction;
+    private List<String> projects;
+    private Status status;
 
     public StudentDTO() {
     }
 
-    public StudentDTO(Long id, String firstname, String lastname, String email, String phoneNumber) {
+
+
+    public StudentDTO(Long id,String image, String firstname, String lastname, String email, String phoneNumber, String direction, List<String> projects, Status status) {
         this.id = id;
+        this.image = image;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.direction = direction;
+        this.projects = projects;
+        this.status = status;
+    }
+
+    public StudentDTO(Long id, String firstName, String lastName, String email, String phoneNumber) {
+        this.id = id;
+        this.firstname = firstName;
+        this.lastname = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
     }
@@ -66,5 +87,36 @@ public class StudentDTO {
 
     public void setPhoneNumber(@NotEmpty String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public List<String> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+        this.projects = projects;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

@@ -30,9 +30,6 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "direction_id")
     private Direction direction;
-    @ManyToOne
-    @JoinColumn(name = "level_id")
-    private Level level;
     @ManyToMany(mappedBy = "students")
     private Set<Project> projects;
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -108,14 +105,6 @@ public class Student {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(Level level) {
-        this.level = level;
     }
 
     public Set<Project> getProjects() {

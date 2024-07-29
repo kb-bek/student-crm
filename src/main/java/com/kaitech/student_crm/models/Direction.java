@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.models;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.models.enums.ProjectType;
 import jakarta.persistence.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class Direction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
     @Column(length = 800)
     private String description;
