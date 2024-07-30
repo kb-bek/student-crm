@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ServicesRequest(
         @NotNull(message = "Title cannot be null")
-        @NotBlank(message = "Price cannot be blank") String title,
+        @NotBlank(message = "Title cannot be blank") String title,
         @NotNull(message = "Description cannot be null")
         @NotBlank(message = "Description cannot be blank") String description,
         @NotNull(message = "Price cannot be null")

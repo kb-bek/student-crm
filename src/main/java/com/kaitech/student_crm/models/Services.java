@@ -2,6 +2,8 @@ package com.kaitech.student_crm.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Services {
     @Id
@@ -11,6 +13,9 @@ public class Services {
     @Column(length = 900)
     private String description;
     private Integer price;
+    @OneToMany(mappedBy = "services", cascade = CascadeType.REMOVE)
+    private List<ServiceItem> serviceItems;
+
 
     public Services(String title, String description, Integer price) {
         this.title = title;
@@ -58,5 +63,13 @@ public class Services {
 
     public void setPrice(Integer price) {
         this.price = price;
+    }
+
+    public List<ServiceItem> getServiceItems() {
+        return serviceItems;
+    }
+
+    public void setServiceItems(List<ServiceItem> serviceItems) {
+        this.serviceItems = serviceItems;
     }
 }

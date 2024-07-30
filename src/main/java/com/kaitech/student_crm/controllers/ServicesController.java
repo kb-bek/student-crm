@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,13 +36,16 @@ public class ServicesController {
 
     @Operation(summary = "Создание новой услуги")
     @PostMapping("create/service")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicesResponse> createService(@Valid @RequestBody ServicesRequest request) {
         return ResponseEntity.ok(servicesService.createService(request));
     }
 
     @Operation(summary = "Обновление услуги по ID")
     @PutMapping("/{serviceId}")
-    public ResponseEntity<ServicesResponse> updateByServiceId(@PathVariable Long serviceId, @Valid @RequestBody ServicesRequest request) {
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ServicesResponse> updateByServiceId(@PathVariable Long serviceId,
+                                                              @Valid @RequestBody ServicesRequest request) {
         return ResponseEntity.ok(servicesService.updateByServiceId(serviceId, request));
     }
 
@@ -62,6 +66,7 @@ public class ServicesController {
 
     @Operation(summary = "Удаление услуги по ID")
     @DeleteMapping("/{serviceId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteByServiceId(@PathVariable Long serviceId) {
         return ResponseEntity.ok(servicesService.deleteByServiceId(serviceId));
     }
