@@ -8,6 +8,7 @@ import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.ProjectRequest;
 import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ProjectResponse;
+import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.repositories.ProjectRepository;
 import com.kaitech.student_crm.repositories.StudentUserRepository;
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -63,16 +65,32 @@ public class ProjectService {
             throw new ProjectNotFoundException("Project with id " + id + " not found");
         }
 
-        projectResponse.setStudents(studentUserRepository.findAllByProjectIdResponse(id));
-        return projectResponse;
+        List<StudentResponse> students = studentUserRepository.findAllByProjectIdResponse(id);
+        return new ProjectResponse(
+                projectResponse.id(),
+                projectResponse.title(),
+                projectResponse.description(),
+                projectResponse.projectType(),
+                students,
+                projectResponse.startDate(),
+                projectResponse.endDate()
+        );
     }
 
     public ProjectResponse findByIdResponse(Long projectId) {
         ProjectResponse response = projectRepository.findByIdResponse(projectId);
-        response.setStudents(studentUserRepository.findAllByProjectId(projectId) == null ? null : studentUserRepository.findAllByProjectId(projectId));
-
-        return response;
+        List<StudentResponse> students = studentUserRepository.findAllByProjectId(projectId);
+        return new ProjectResponse(
+                response.id(),
+                response.title(),
+                response.description(),
+                response.projectType(),
+                students,
+                response.startDate(),
+                response.endDate()
+        );
     }
+
 
     public ProjectResponse createProject(ProjectRequest projectRequest, List<Long> studentIds) {
         try {
@@ -86,8 +104,8 @@ public class ProjectService {
                 throw new IllegalArgumentException("Дата начала должна быть сегодня или в будущем");
             }
 
-            if (projectRequest.getEndDate() != null && projectRequest.getEndDate().isBefore(projectRequest.getStartDate())) {
-                throw new IllegalArgumentException("Дата окончания должна быть не меньше даты начала");
+            if (projectRequest.getEndDate() != null && !projectRequest.getEndDate().isAfter(projectRequest.getStartDate())) {
+                throw new IllegalArgumentException("Дата окончания должна быть не меньше и не равна дате начала");
             }
 
             Project newProject = new Project();
@@ -108,7 +126,6 @@ public class ProjectService {
         }
     }
 
-
     public ProjectResponse updateProject(Long id, ProjectRequest projectRequest) {
         Project existingProject = projectRepository.findById(id)
                 .orElseThrow(() -> new ProjectNotFoundException("Проект с id " + id + " не найден"));
@@ -126,8 +143,8 @@ public class ProjectService {
             throw new IllegalArgumentException("Новая дата окончания не может быть раньше предыдущей даты окончания");
         }
 
-        if (newStartDate != null && newEndDate != null && newEndDate.isBefore(newStartDate)) {
-            throw new IllegalArgumentException("Новая дата окончания не может быть раньше новой даты начала");
+        if (newStartDate != null && newEndDate != null && !newEndDate.isAfter(newStartDate)) {
+            throw new IllegalArgumentException("Новая дата окончания должна быть не меньше и не равна новой дате начала");
         }
 
         if (projectRequest.getTitle() != null && !projectRequest.getTitle().equals(existingProject.getTitle())) {
@@ -175,9 +192,18 @@ public class ProjectService {
         projectRepository.save(project);
 
         ProjectResponse projectResponse = projectRepository.findByIdResponse(projectId);
-        projectResponse.setStudents(studentUserRepository.findAllByProjectIdResponse(projectId));
-        return projectResponse;
+        List<StudentResponse> students = studentUserRepository.findAllByProjectIdResponse(projectId);
+        return new ProjectResponse(
+                projectResponse.id(),
+                projectResponse.title(),
+                projectResponse.description(),
+                projectResponse.projectType(),
+                students,
+                projectResponse.startDate(),
+                projectResponse.endDate()
+        );
     }
+
 
     public void removeStudentFromProject(Long projectId, Long studentId) {
         Project project = projectRepository.findById(projectId).orElseThrow(
