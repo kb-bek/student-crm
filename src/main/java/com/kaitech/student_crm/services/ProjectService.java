@@ -1,5 +1,6 @@
 package com.kaitech.student_crm.services;
 
+import com.kaitech.student_crm.exceptions.ProjectAlreadyCompletedException;
 import com.kaitech.student_crm.exceptions.ProjectNotFoundException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Project;
@@ -15,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -32,11 +35,22 @@ public class ProjectService {
     }
 
     public ProjectResponse saveAllStudentInProject(Long projectId, List<Long> studentIds) {
-        Project project = projectRepository.findById(projectId).orElseThrow();
-        project.getStudents().addAll(studentUserRepository.findAllById(studentIds));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Проект с id " + projectId + " не найден"));
+
+        LocalDate today = LocalDate.now();
+        if (project.getEndDate() != null && !project.getEndDate().isAfter(today)) {
+            throw new ProjectAlreadyCompletedException("Нельзя добавлять студентов в завершенный проект");
+        }
+
+        List<Student> students = studentUserRepository.findAllById(studentIds);
+        project.getStudents().addAll(students);
+
         projectRepository.save(project);
+
         return findByIdResponse(project.getId());
     }
+
 
     public List<ProjectResponse> getAllProjects() {
         return projectRepository.findAllResponse();
@@ -61,33 +75,80 @@ public class ProjectService {
     }
 
     public ProjectResponse createProject(ProjectRequest projectRequest, List<Long> studentIds) {
-        Project newProject = new Project();
-        newProject.setTitle(projectRequest.getTitle());
-        newProject.setDescription(projectRequest.getDescription());
-        newProject.setProjectType(projectRequest.getProjectType());
-        newProject.setStartDate(projectRequest.getStartDate());
-        newProject.setEndDate(projectRequest.getEndDate());
-        newProject.getStudents().addAll(studentUserRepository.findAllById(studentIds));
-        projectRepository.save(newProject);
-        return findByIdResponse(newProject.getId());
+        try {
+            if (projectRepository.existsByTitle(projectRequest.getTitle())) {
+                throw new IllegalArgumentException("Проект с таким заголовком уже существует");
+            }
+
+            LocalDate today = LocalDate.now();
+
+            if (projectRequest.getStartDate() == null || projectRequest.getStartDate().isBefore(today)) {
+                throw new IllegalArgumentException("Дата начала должна быть сегодня или в будущем");
+            }
+
+            if (projectRequest.getEndDate() != null && projectRequest.getEndDate().isBefore(projectRequest.getStartDate())) {
+                throw new IllegalArgumentException("Дата окончания должна быть не меньше даты начала");
+            }
+
+            Project newProject = new Project();
+            newProject.setTitle(projectRequest.getTitle());
+            newProject.setDescription(projectRequest.getDescription());
+            newProject.setProjectType(projectRequest.getProjectType());
+            newProject.setStartDate(projectRequest.getStartDate());
+            newProject.setEndDate(projectRequest.getEndDate());
+            newProject.getStudents().addAll(studentUserRepository.findAllById(studentIds));
+
+            projectRepository.save(newProject);
+
+            return findByIdResponse(newProject.getId());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Произошла непредвиденная ошибка", e);
+        }
     }
 
 
     public ProjectResponse updateProject(Long id, ProjectRequest projectRequest) {
-        ProjectResponse projectResponse = getProjectById(id);
+        Project existingProject = projectRepository.findById(id)
+                .orElseThrow(() -> new ProjectNotFoundException("Проект с id " + id + " не найден"));
 
-        if (projectResponse == null) {
-            throw new ProjectNotFoundException("Project with id " + id + " not found");
+        LocalDate oldStartDate = existingProject.getStartDate();
+        LocalDate oldEndDate = existingProject.getEndDate();
+        LocalDate newStartDate = projectRequest.getStartDate();
+        LocalDate newEndDate = projectRequest.getEndDate();
+
+        if (newStartDate != null && newStartDate.isBefore(oldStartDate)) {
+            throw new IllegalArgumentException("Новая дата начала не может быть раньше предыдущей даты начала");
         }
 
-        projectResponse.setTitle(projectRequest.getTitle());
-        projectResponse.setDescription(projectRequest.getDescription());
-        projectResponse.setProjectType(projectRequest.getProjectType());
-        projectResponse.setStartDate(projectRequest.getStartDate());
-        projectResponse.setEndDate(projectRequest.getEndDate());
-        projectRepository.save(convertToProject(projectResponse));
-        return findByIdResponse(projectResponse.getId());
+        if (newEndDate != null && newEndDate.isBefore(oldEndDate)) {
+            throw new IllegalArgumentException("Новая дата окончания не может быть раньше предыдущей даты окончания");
+        }
+
+        if (newStartDate != null && newEndDate != null && newEndDate.isBefore(newStartDate)) {
+            throw new IllegalArgumentException("Новая дата окончания не может быть раньше новой даты начала");
+        }
+
+        if (projectRequest.getTitle() != null && !projectRequest.getTitle().equals(existingProject.getTitle())) {
+            boolean titleExists = projectRepository.existsByTitle(projectRequest.getTitle());
+            if (titleExists) {
+                throw new IllegalArgumentException("Проект с таким названием уже существует");
+            }
+        }
+
+        existingProject.setTitle(projectRequest.getTitle());
+        existingProject.setDescription(projectRequest.getDescription());
+        existingProject.setProjectType(projectRequest.getProjectType());
+        existingProject.setStartDate(newStartDate != null ? newStartDate : oldStartDate);
+        existingProject.setEndDate(newEndDate != null ? newEndDate : oldEndDate);
+
+        projectRepository.save(existingProject);
+
+        return findByIdResponse(existingProject.getId());
     }
+
+
 
     public void deleteProject(Long id) {
         ProjectResponse projectResponse = getProjectById(id);
@@ -100,11 +161,19 @@ public class ProjectService {
 
     public ProjectResponse addStudentToProject(Long projectId, Long studentId) {
         Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ProjectNotFoundException("Project this id " + projectId + " not found"));
+                () -> new ProjectNotFoundException("Проект с id " + projectId + " не найден"));
+
+        LocalDate today = LocalDate.now();
+        if (project.getEndDate() != null && !project.getEndDate().isAfter(today)) {
+            throw new ProjectAlreadyCompletedException("Нельзя добавлять студента в завершенный проект");
+        }
+
         Student student = studentUserRepository.findById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Student not found"));
+                .orElseThrow(() -> new StudentNotFoundException("Студент не найден"));
+
         project.getStudents().add(student);
         projectRepository.save(project);
+
         ProjectResponse projectResponse = projectRepository.findByIdResponse(projectId);
         projectResponse.setStudents(studentUserRepository.findAllByProjectIdResponse(projectId));
         return projectResponse;
