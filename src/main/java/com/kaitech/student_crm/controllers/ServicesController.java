@@ -36,14 +36,14 @@ public class ServicesController {
 
     @Operation(summary = "Создание новой услуги")
     @PostMapping("create/service")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicesResponse> createService(@Valid @RequestBody ServicesRequest request) {
         return ResponseEntity.ok(servicesService.createService(request));
     }
 
     @Operation(summary = "Обновление услуги по ID")
     @PutMapping("/{serviceId}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServicesResponse> updateByServiceId(@PathVariable Long serviceId,
                                                               @Valid @RequestBody ServicesRequest request) {
         return ResponseEntity.ok(servicesService.updateByServiceId(serviceId, request));
@@ -66,7 +66,7 @@ public class ServicesController {
 
     @Operation(summary = "Удаление услуги по ID")
     @DeleteMapping("/{serviceId}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteByServiceId(@PathVariable Long serviceId) {
         return ResponseEntity.ok(servicesService.deleteByServiceId(serviceId));
     }

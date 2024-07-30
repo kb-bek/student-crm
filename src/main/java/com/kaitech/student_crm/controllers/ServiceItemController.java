@@ -7,6 +7,7 @@ import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ServiceItemResponse;
 import com.kaitech.student_crm.services.ServiceItemService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,7 @@ public class ServiceItemController {
 
     @Operation(summary = "Создание нового элемента сервиса")
     @PostMapping("create/item")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServiceItemResponse> createServiceItem(@Valid @RequestBody ServiceItemRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(serviceItemService.createItem(request));
     }
@@ -54,6 +56,7 @@ public class ServiceItemController {
 
     @Operation(summary = "Обновление элемента сервиса по ID")
     @PutMapping("update/item/by/{serviceItemId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ServiceItemResponse> updateServiceItem(@PathVariable Long serviceItemId,
                                                                  @Valid @RequestBody ServiceItemRequest request) {
         return ResponseEntity.ok(serviceItemService.updateItemById(serviceItemId, request));
@@ -61,6 +64,7 @@ public class ServiceItemController {
 
     @Operation(summary = "Удаление элемента сервиса по ID")
     @DeleteMapping("delete/item/by/{serviceItemId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteServiceItem(@PathVariable Long serviceItemId) {
         return ResponseEntity.ok().body(serviceItemService.deleteItemById(serviceItemId));
     }
