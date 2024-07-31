@@ -19,7 +19,7 @@ public class InternAuthController {
     }
 
     @PostMapping("registered/for/student/{email}/{code}")
-    @Operation(method = "The student registers using this link")
+    @Operation(summary = "The student registers using this link")
     public StudentResponse registerStudent(@PathVariable String email,
                                            @PathVariable Integer code,
                                            @RequestParam @Valid @Size(min = 8) String password) {
