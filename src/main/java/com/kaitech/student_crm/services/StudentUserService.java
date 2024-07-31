@@ -1,11 +1,9 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
-import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
+import com.kaitech.student_crm.exceptions.*;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
-import com.kaitech.student_crm.exceptions.StudentNotFoundException;
-import com.kaitech.student_crm.exceptions.UserExistException;
 import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
@@ -70,6 +68,16 @@ public class StudentUserService {
             throw new RuntimeException("This email already exists. Email must be unique.");
         }
 
+
+    public StudentResponse createStudent(StudentDataRequest student, Status status, Long directionId) {
+        if (directionRepository.findById(directionId).isEmpty()) {
+            throw new NotFoundException("Такого направления не существует.");
+        }
+
+        if (studentUserRepository.existsByEmail(student.getEmail()) || userRepository.existsByEmail(student.getEmail())) {
+            throw new EmailAlreadyExistsException("Этот email уже существует. Email должен быть уникальным.");
+        }
+
         Random random = new Random();
         Integer randomCode = random.nextInt(100000000, 999999999);
         Student newStudent = new Student();
@@ -81,7 +89,6 @@ public class StudentUserService {
         newStudent.setEmail(student.getEmail());
         newStudent.setDirection(directionRepository.findById(directionId).get());
         newStudent.setPhoneNumber(student.getPhoneNumber());
-
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(newStudent.getEmail());
@@ -90,17 +97,16 @@ public class StudentUserService {
             javaMailSender.send(message);
         } catch (MailException e) {
             LOGGER.error("Ошибка при отправке письма на email: {}", newStudent.getEmail());
-            throw new RuntimeException("Please enter a valid email address.");
         }
-
+        throw new InvalidEmailException("Пожалуйста, введите действительный адрес электронной почты.");
+        }
         try {
             LOGGER.info("Сохранение студента {}", student.getEmail());
             studentUserRepository.save(newStudent);
         } catch (Exception e) {
             LOGGER.error("Ошибка при регистрации, {}", e.getMessage());
-            throw new UserExistException("The student " + newStudent.getFirstName() + " " + newStudent.getLastName() + " already exists");
+            throw new UserExistException("Студент " + newStudent.getFirstName() + " " + newStudent.getLastName() + " уже существует");
         }
-
         return findById(newStudent.getId());
     }
 
@@ -134,6 +140,7 @@ public class StudentUserService {
         }
     }
 
+
     public List<StudentResponse> getAllStudents() {
         LOGGER.info("Получение всех студентов");
         return studentUserRepository.findAllResponse();
@@ -144,11 +151,12 @@ public class StudentUserService {
         return studentUserRepository.findAllStudentDTOs();
     }
 
+
     public StudentDTO findStudentById(Long studentId) {
         LOGGER.info("Получение студента с ID: {}", studentId);
 
         Student student = studentUserRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("Стажер с ID: " + studentId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Стажер с ID: " + studentId + "не найден"));
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setImage(student.getImage());
@@ -170,10 +178,11 @@ public class StudentUserService {
         return studentDTO;
     }
 
+
     public Student getStudentById(Long studentId) {
         LOGGER.info("Получение студента сущности с ID: {}", studentId);
         return studentUserRepository.findUserById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Student cannot be found"));
+                .orElseThrow(() -> new NotFoundException("Student cannot be found"));
     }
 
     @Transactional
@@ -236,12 +245,14 @@ public class StudentUserService {
         return findById(student.getId());
     }
 
+
     @Transactional
     public StudentResponse updateStudentStatus(Long id, Status newStatus) {
         try {
             LOGGER.info("Попытка обновить статус студента с ID: {}", id);
 
-            Student student = getStudentById(id);
+            Student student = studentUserRepository.findUserById(id)
+                    .orElseThrow(() -> new NotFoundException("Student cannot be found"));
 
             LOGGER.debug("Текущий статус: {}, Новый статус: {}", student.getStatus(), newStatus);
 
@@ -261,9 +272,9 @@ public class StudentUserService {
                     updatedStudent.getStatus()
             );
 
-        } catch (EntityNotFoundException e) {
-            LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, e);
-            throw e;
+        } catch (NotFoundException ex) {
+            LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, ex);
+            throw ex;
 
         } catch (IllegalArgumentException e) {
             LOGGER.error("Ошибка обновления статуса: Недопустимый аргумент для студента с ID: {}", id, e);
@@ -279,6 +290,8 @@ public class StudentUserService {
         LOGGER.info("Добавление баллов студенту с ID: {}", studentId);
 
         Student student = studentUserRepository.findById(studentId).orElseThrow(
+                () -> new NotFoundException("Not found student ID: " + studentId)
+        );
                 () -> {
                     LOGGER.error("Студент с ID: {} не найден", studentId);
                     return new StudentNotFoundException("Not found student ID: " + studentId);
@@ -294,6 +307,8 @@ public class StudentUserService {
         LOGGER.info("Поиск информации о студенте с ID: {}", studentId);
 
         studentUserRepository.findById(studentId).orElseThrow(
+                () -> new NotFoundException("Not found student ID: " + studentId)
+        );
                 () -> {
                     LOGGER.error("Студент с ID: {} не найден", studentId);
                     return new StudentNotFoundException("Not found student ID: " + studentId);
@@ -304,4 +319,5 @@ public class StudentUserService {
         LOGGER.info("Информация о студенте с ID: {} успешно найдена", studentId);
         return dto;
     }
+
 }

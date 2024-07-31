@@ -2,6 +2,7 @@ package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
 import com.kaitech.student_crm.exceptions.ResourceNotFoundException;
+import com.kaitech.student_crm.exceptions.NotFoundException;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
@@ -32,6 +33,7 @@ public class DirectionService {
         this.studentUserRepository = studentUserRepository;
     }
 
+
     public DirectionResponse createDirection(DirectionCreateRequest directionCreateRequest) {
         try {
             LOGGER.info("Создание нового Direction с именем: {}", directionCreateRequest.getName());
@@ -58,7 +60,7 @@ public class DirectionService {
             LOGGER.info("Direction с id: {} успешно создан", savedDirection.getId());
 
             DirectionResponse responseDTO = new DirectionResponse();
-            responseDTO.setId(savedDirection.getId()); // Устанавливаем id из сохраненного объекта
+            responseDTO.setId(savedDirection.getId());
             responseDTO.setName(savedDirection.getName());
             responseDTO.setDescription(savedDirection.getDescription());
 
@@ -76,6 +78,8 @@ public class DirectionService {
         }
     }
 
+
+
     public Direction assignStudentToDirection(Long directionId, Long studentId) {
         LOGGER.info("Назначение студента с id: {} к Direction с id: {}", studentId, directionId);
 
@@ -86,6 +90,7 @@ public class DirectionService {
             Direction direction = optionalDirection.get();
             Student student = optionalStudent.get();
 
+
             student.setDirection(direction);
             studentUserRepository.save(student);
 
@@ -94,14 +99,22 @@ public class DirectionService {
             return directionRepository.save(direction);
         } else {
             LOGGER.error("Direction с id: {} или Student с id: {} не найден", directionId, studentId);
-            throw new IllegalArgumentException("Direction or Student not found");
+            throw new NotFoundException("Direction or Student not found");
         }
+    }
+
+    public Direction getDirectionWithStudents(Long directionId) {
+        return directionRepository.findById(directionId).orElse(null);
+    }
+
+    public List<Direction> getAllDirectionsWithStudents() {
+        return directionRepository.findAll();
     }
 
     public void deleteDirection(Long id) {
         LOGGER.info("Удаление Direction с id: {}", id);
         Direction direction = directionRepository.findById(id)
-                .orElseThrow(() -> new DirectionNotFoundException("Direction not found"));
+                .orElseThrow(() -> new NotFoundException("Direction not found"));
 
         directionRepository.delete(direction);
         LOGGER.info("Direction с id: {} успешно удален", id);
@@ -112,11 +125,13 @@ public class DirectionService {
         return directionRepository.findAllDirections();
     }
 
+
     public DirectionResponse getById(Long id) {
         LOGGER.info("Получение Direction по id: {}", id);
         Direction direction = directionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Direction not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Direction not found with id: " + id));
 
+        // Создание объекта DirectionResponse с нужными полями
         DirectionResponse response = new DirectionResponse();
         response.setId(direction.getId());
         response.setName(direction.getName());

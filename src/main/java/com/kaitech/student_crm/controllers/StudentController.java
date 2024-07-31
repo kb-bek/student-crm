@@ -13,7 +13,6 @@ import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.validations.ResponseErrorValidation;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,14 +46,10 @@ public class StudentController {
     @GetMapping("/{studentId}")
     @Operation(summary = "Получение студента по идентификатору")
     public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long studentId) {
-        try {
-            return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
+
     }
+
 
     @GetMapping("/all")
     @Operation(summary = "Получение списка всех студентов")
@@ -118,9 +113,9 @@ public class StudentController {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-    @ExceptionHandler(StudentNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private ResponseEntity<MessageResponse> handleLevelNotFound(StudentNotFoundException e) {
-        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    private User convertToStudent(StudentDTO studentDTO) {
+        return modelMapper.map(studentDTO, User.class);
     }
+
+
 }
