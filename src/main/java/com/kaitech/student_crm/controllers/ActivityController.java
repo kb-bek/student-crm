@@ -7,6 +7,7 @@ import com.kaitech.student_crm.exceptions.ActivityNotFoundException;
 import com.kaitech.student_crm.exceptions.ActivityNotUpdatedException;
 import com.kaitech.student_crm.models.Activity;
 import com.kaitech.student_crm.services.ActivityService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,33 +30,33 @@ public class ActivityController {
     private ActivityService activityService;
 
     @Autowired
-    private  ModelMapper modelMapper;
-
+    private ModelMapper modelMapper;
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
-    public List<Activity> getAllActivity(){
+    @Operation(summary = "Получение списка всех Activity")
+    public List<Activity> getAllActivity() {
         return activityService.findAll();
     }
 
-    // Метод для вывода Activity по id
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
+    @Operation(summary = "Получение Activity по ID")
     public Optional<Activity> getTaskById(@PathVariable Long id) {
         return activityService.findById(id);
     }
 
-    // Метод для создания Activity
     @PostMapping("/new")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Создание новой Activity")
     public ResponseEntity<HttpStatus> createActivity(@RequestBody @Valid ActivityDTO activityDTO,
-                                                     BindingResult bindingResult){
+                                                     BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
 
             List<FieldError> errors = bindingResult.getFieldErrors();
-            for(FieldError error : errors){
+            for (FieldError error : errors) {
                 errorMessage.append(error.getField())
                         .append(" - ").append(error.getDefaultMessage())
                         .append(",");
@@ -69,9 +70,9 @@ public class ActivityController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    // Метод для обновления Activity
     @PutMapping("/{id}/update")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Обновление Activity по ID")
     public ResponseEntity<HttpStatus> updateActivity(@PathVariable Long id, @RequestBody @Valid ActivityDTO activityDTO,
                                                      BindingResult result) {
         if (result.hasErrors()) {
@@ -91,16 +92,16 @@ public class ActivityController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    // Метод для удаления Activity
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Удаление Activity по ID")
     public ResponseEntity<HttpStatus> deleteActivity(@PathVariable Long id) {
         activityService.deleteActivity(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @ExceptionHandler
-    private ResponseEntity<ActivityErrorResponse> handleException(ActivityNotFoundException e){
+    private ResponseEntity<ActivityErrorResponse> handleException(ActivityNotFoundException e) {
         ActivityErrorResponse activityErrorResponse = new ActivityErrorResponse(
                 "Activity with this id wasn't found!",
                 System.currentTimeMillis()
@@ -111,7 +112,7 @@ public class ActivityController {
 
     @ExceptionHandler
     private ResponseEntity<ActivityErrorResponse> handleException(ActivityNotCreatedException e) {
-            ActivityErrorResponse activityErrorResponse = new ActivityErrorResponse(
+        ActivityErrorResponse activityErrorResponse = new ActivityErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis()
         );
@@ -119,15 +120,7 @@ public class ActivityController {
         return new ResponseEntity<>(activityErrorResponse, HttpStatus.NOT_FOUND);
     }
 
-
-
     private Activity convertToActivity(ActivityDTO activityDTO) {
         return modelMapper.map(activityDTO, Activity.class);
     }
-
-    private ActivityDTO convertToActivityDTO(Activity activity){
-        return modelMapper.map(activity, ActivityDTO.class);
-    }
-
-
 }
