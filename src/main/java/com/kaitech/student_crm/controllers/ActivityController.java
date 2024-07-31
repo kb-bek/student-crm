@@ -1,3 +1,4 @@
+
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.ActivityDTO;
@@ -32,7 +33,6 @@ public class ActivityController {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @Operation(summary = "Получение списка всех Activity")
@@ -40,7 +40,6 @@ public class ActivityController {
         return activityService.findAll();
     }
 
-    // Метод для вывода Activity по id
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @Operation(summary = "Получение Activity по ID")
@@ -48,7 +47,6 @@ public class ActivityController {
         return activityService.findById(id);
     }
 
-    // Метод для создания Activity
     @PostMapping("/new")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Создание новой Activity")
@@ -73,7 +71,6 @@ public class ActivityController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    // Метод для обновления Activity
     @PutMapping("/{id}/update")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Обновление Activity по ID")
@@ -96,7 +93,6 @@ public class ActivityController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    // Метод для удаления Activity
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Удаление Activity по ID")
@@ -122,6 +118,8 @@ public class ActivityController {
                 System.currentTimeMillis()
         );
 
+        return new ResponseEntity<>(activityErrorResponse, HttpStatus.NOT_FOUND);
+    }
 
     private Activity convertToActivity(ActivityDTO activityDTO) {
         return modelMapper.map(activityDTO, Activity.class);
