@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
+import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
@@ -253,4 +254,5 @@ public class StudentUserService {
         dto.setProjects(projectRepository.findTitlesByStudentId(studentId));
         return dto;
     }
+
 }

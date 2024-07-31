@@ -43,4 +43,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select p.title from Project p join p.students s on s.id = :studentId")
     List<String> findTitlesByStudentId(@Param(value = "studentId") Long studentId);
+
+    boolean existsByTitle(String title);
 }

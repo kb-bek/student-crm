@@ -1,6 +1,7 @@
 package com.kaitech.student_crm.controllers;
 
 import com.kaitech.student_crm.dtos.ProjectDTO;
+import com.kaitech.student_crm.exceptions.ProjectAlreadyCompletedException;
 import com.kaitech.student_crm.exceptions.ProjectNotFoundException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Project;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -105,5 +108,17 @@ public class ProjectController {
     public ResponseEntity<MessageResponse> handleProjectNotFoundException(StudentNotFoundException ex) {
         MessageResponse messageResponse = new MessageResponse("Student not found this id");
         return new ResponseEntity<>(messageResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex) {
+        return new ResponseEntity<>(ex.getReason(), ex.getStatusCode());
+    }
+    @ExceptionHandler(ProjectAlreadyCompletedException.class)
+    public ResponseEntity<String> handleProjectAlreadyCompletedException(ProjectAlreadyCompletedException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }
