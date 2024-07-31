@@ -32,13 +32,11 @@ public class ReportController {
 
     private final ReportService reportService;
     private final ResponseErrorValidation responseErrorValidation;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public ReportController(ReportService reportService, StudentUserService studentUserService, ActivityService activityService, WeeksdayService weeksdayService, ResponseErrorValidation responseErrorValidation, ModelMapper modelMapper) {
+    public ReportController(ReportService reportService, ResponseErrorValidation responseErrorValidation) {
         this.reportService = reportService;
         this.responseErrorValidation = responseErrorValidation;
-        this.modelMapper = modelMapper;
     }
 
     @Operation(summary = "Создать новый отчет")
@@ -80,15 +78,5 @@ public class ReportController {
 
         reportService.deleteReport(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-
-
-    private Report convertToReport(ReportDTO reportDTO) {
-        return modelMapper.map(reportDTO, Report.class);
-    }
-
-    private ReportDTO convertToReportDTO(Report report) {
-        return modelMapper.map(report,  ReportDTO.class);
     }
 }

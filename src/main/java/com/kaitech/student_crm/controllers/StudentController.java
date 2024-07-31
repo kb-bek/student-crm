@@ -3,7 +3,6 @@ package com.kaitech.student_crm.controllers;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
-import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
@@ -46,6 +45,7 @@ public class StudentController {
     }
 
     @GetMapping("/{studentId}")
+    @Operation(summary = "Получение студента по идентификатору")
     public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long studentId) {
         try {
             return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
@@ -56,15 +56,15 @@ public class StudentController {
         }
     }
 
-
     @GetMapping("/all")
+    @Operation(summary = "Получение списка всех студентов")
     public ResponseEntity<List<StudentDTOForAll>> getAllStudents() {
         List<StudentDTOForAll> students = studentUserService.findAllStudents();
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @PostMapping("/add/intern/{directionId}")
-    @Operation(method = "Method for adding new interns", description = "Can only be used ROLE_ADMIN")
+    @Operation(summary = "Добавление нового стажера", description = "Этот метод может использовать только ROLE_ADMIN")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public StudentResponse addStudent(@Valid @RequestBody StudentDataRequest studentDataRequest,
                                       @RequestParam Status status,
@@ -73,12 +73,14 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}/delete")
+    @Operation(summary = "Удаление студента по идентификатору")
     public ResponseEntity<MessageResponse> deleteStudent(@PathVariable("id") String studentId) {
         studentUserService.deleteStudent(Long.parseLong(studentId));
         return new ResponseEntity<>(new MessageResponse("Student was deleted"), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/update")
+    @Operation(summary = "Обновление данных студента")
     public ResponseEntity<Object> updateStudent(
             @PathVariable("id") String studentId,
             @Valid @RequestBody StudentDTO studentDTO,
@@ -97,15 +99,15 @@ public class StudentController {
         }
     }
 
-    @Operation(summary = "Изменение статуса стажера")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/students/{id}/status")
+    @Operation(summary = "Изменение статуса студента", description = "Этот метод может использовать только ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public StudentResponse updateStudentStatus(@PathVariable Long id, @RequestParam Status status) {
         return studentUserService.updateStudentStatus(id, status);
     }
 
     @PutMapping("add/point/student/by/{studentId}")
-    @Operation(summary = "Добавляет студенту баллы и при помощи этого он получает уровень, этот метод может использовать только ROLE_ADMIN")
+    @Operation(summary = "Добавление баллов студенту", description = "Этот метод может использовать только ROLE_ADMIN")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<StudentDTO> addPointStudent(@PathVariable Long studentId,
                                                       @RequestParam Integer point) {
@@ -114,10 +116,6 @@ public class StudentController {
 
     private StudentDTO convertToStudentDTO(Student student) {
         return modelMapper.map(student, StudentDTO.class);
-    }
-
-    private User convertToStudent(StudentDTO studentDTO) {
-        return modelMapper.map(studentDTO, User.class);
     }
 
     @ExceptionHandler(StudentNotFoundException.class)

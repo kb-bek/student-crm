@@ -111,6 +111,5 @@ public class LevelService {
             LOGGER.error("pointFrom: {} не может быть больше или равен pointTo: {}", request.pointFrom(), request.pointTo());
             throw new LevelBadRequest("pointTo should be greater than pointFrom");
         }
-
     }
 }

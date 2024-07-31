@@ -23,29 +23,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/project")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
 
-    @Operation(summary = "Вывод всех проектов")
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
+    @Operation(summary = "Вывод всех проектов")
     public List<ProjectResponse> getAllProjects() {
         return projectService.getAllProjects();
     }
 
-    @Operation(summary = "Вывод проекта по id")
-    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_ADMIN')")
+    @Operation(summary = "Вывод проекта по id")
     public ProjectResponse getProjectById(@PathVariable Long id) {
         return projectService.getProjectById(id);
     }
 
-    @Operation(summary = "Создание нового проекта")
-    @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/create")
+    @Operation(summary = "Создание нового проекта")
     public ProjectResponse createProject(
             @RequestBody ProjectRequest projectRequest,
             @RequestParam(defaultValue = "") List<Long> studIds) {
@@ -53,41 +52,41 @@ public class ProjectController {
         return projectService.createProject(projectRequest, studIds);
     }
 
-    @Operation(summary = "Изменение проекта")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Изменение проекта")
     public ProjectResponse updateProject(@PathVariable Long id, @RequestBody ProjectRequest projectRequest) {
         return projectService.updateProject(id, projectRequest);
     }
 
-    @Operation(summary = "Удаление проекта")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Удаление проекта")
     public ResponseEntity<HttpStatus> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Добавление студента в проект")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("add/student/{projectId}/{studentId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Добавление студента в проект")
     public ProjectResponse addStudentToProject(@PathVariable Long projectId,
                                                @PathVariable Long studentId) {
         return projectService.addStudentToProject(projectId, studentId);
     }
 
-    @Operation(summary = "Удаление студента из проекта")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{projectId}/students/{studentId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Удаление студента из проекта")
     public ResponseEntity<HttpStatus> removeStudentFromProject(@PathVariable Long projectId,
                                                                @PathVariable Long studentId) {
         projectService.removeStudentFromProject(projectId, studentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "Добавляет много студентов")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("add/students/{projectId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Добавляет много студентов")
     public ProjectResponse saveAllStudent(@PathVariable Long projectId,
                                           @RequestParam List<Long> studentIds) {
         return projectService.saveAllStudentInProject(projectId, studentIds);
