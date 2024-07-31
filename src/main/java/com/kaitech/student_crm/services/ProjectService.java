@@ -1,12 +1,10 @@
 package com.kaitech.student_crm.services;
 
+import com.kaitech.student_crm.exceptions.NotFoundException;
 import com.kaitech.student_crm.exceptions.ProjectAlreadyCompletedException;
-import com.kaitech.student_crm.exceptions.ProjectNotFoundException;
-import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.ProjectRequest;
-import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ProjectResponse;
 import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.repositories.ProjectRepository;
@@ -14,13 +12,10 @@ import com.kaitech.student_crm.repositories.StudentUserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -38,7 +33,7 @@ public class ProjectService {
 
     public ProjectResponse saveAllStudentInProject(Long projectId, List<Long> studentIds) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException("Проект с id " + projectId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Проект с id " + projectId + " не найден"));
 
         LocalDate today = LocalDate.now();
         if (project.getEndDate() != null && !project.getEndDate().isAfter(today)) {
@@ -46,12 +41,17 @@ public class ProjectService {
         }
 
         List<Student> students = studentUserRepository.findAllById(studentIds);
-        project.getStudents().addAll(students);
 
+        if (students.size() != studentIds.size()) {
+            throw new NotFoundException("Один или несколько студентов не найдены");
+        }
+
+        project.getStudents().addAll(students);
         projectRepository.save(project);
 
         return findByIdResponse(project.getId());
     }
+
 
 
     public List<ProjectResponse> getAllProjects() {
@@ -62,7 +62,7 @@ public class ProjectService {
         ProjectResponse projectResponse = projectRepository.findByIdResponse(id);
 
         if (projectResponse == null) {
-            throw new ProjectNotFoundException("Project with id " + id + " not found");
+            throw new NotFoundException("Project with id " + id + " not found");
         }
 
         List<StudentResponse> students = studentUserRepository.findAllByProjectIdResponse(id);
@@ -128,7 +128,7 @@ public class ProjectService {
 
     public ProjectResponse updateProject(Long id, ProjectRequest projectRequest) {
         Project existingProject = projectRepository.findById(id)
-                .orElseThrow(() -> new ProjectNotFoundException("Проект с id " + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Проект с id " + id + " не найден"));
 
         LocalDate oldStartDate = existingProject.getStartDate();
         LocalDate oldEndDate = existingProject.getEndDate();
@@ -171,14 +171,14 @@ public class ProjectService {
         ProjectResponse projectResponse = getProjectById(id);
 
         if (projectResponse == null) {
-            throw new ProjectNotFoundException("Project with id " + id + " not found");
+            throw new NotFoundException("Project with id " + id + " not found");
         }
         projectRepository.delete(convertToProject(projectResponse));
     }
 
     public ProjectResponse addStudentToProject(Long projectId, Long studentId) {
         Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ProjectNotFoundException("Проект с id " + projectId + " не найден"));
+                () -> new NotFoundException("Проект с id " + projectId + " не найден"));
 
         LocalDate today = LocalDate.now();
         if (project.getEndDate() != null && !project.getEndDate().isAfter(today)) {
@@ -186,7 +186,7 @@ public class ProjectService {
         }
 
         Student student = studentUserRepository.findById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Студент не найден"));
+                .orElseThrow(() -> new NotFoundException("Студент не найден"));
 
         project.getStudents().add(student);
         projectRepository.save(project);
@@ -207,9 +207,9 @@ public class ProjectService {
 
     public void removeStudentFromProject(Long projectId, Long studentId) {
         Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ProjectNotFoundException("Project this id " + projectId + " not found"));
+                () -> new NotFoundException("Project this id " + projectId + " not found"));
         Student student = studentUserRepository.findById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Student not found"));
+                .orElseThrow(() -> new NotFoundException("Student not found"));
         project.getStudents().remove(student);
         projectRepository.save(project);
     }

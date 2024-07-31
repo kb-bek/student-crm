@@ -1,11 +1,9 @@
 package com.kaitech.student_crm.services;
 
 import com.kaitech.student_crm.dtos.StudentDTO;
-import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
+import com.kaitech.student_crm.exceptions.*;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
-import com.kaitech.student_crm.exceptions.StudentNotFoundException;
-import com.kaitech.student_crm.exceptions.UserExistException;
 import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
@@ -57,42 +55,48 @@ public class StudentUserService {
     }
 
 
-    public StudentResponse createStudent(StudentDataRequest student,
-                                         Status status,
-                                         Long directionId) {
-        if (directionRepository.findById(directionId).isEmpty())
-            throw new RuntimeException("There is no such direction.");
-        if (studentUserRepository.existsByEmail(student.getEmail()) || userRepository.existsByEmail(student.getEmail()))
-            throw new RuntimeException("This email already exists. Email must be unique.");
+    public StudentResponse createStudent(StudentDataRequest student, Status status, Long directionId) {
+        if (directionRepository.findById(directionId).isEmpty()) {
+            throw new NotFoundException("Такого направления не существует.");
+        }
+
+        if (studentUserRepository.existsByEmail(student.getEmail()) || userRepository.existsByEmail(student.getEmail())) {
+            throw new EmailAlreadyExistsException("Этот email уже существует. Email должен быть уникальным.");
+        }
+
         Random random = new Random();
         Integer randomCode = random.nextInt(100000000, 999999999);
         Student newStudent = new Student();
-        newStudent.setLastName(student.getFirstname());
-        newStudent.setFirstName(student.getLastname());
+        newStudent.setLastName(student.getLastname());
+        newStudent.setFirstName(student.getFirstname());
         newStudent.setCode(randomCode);
         newStudent.setImage(student.getImage());
         newStudent.setStatus(status);
         newStudent.setEmail(student.getEmail());
         newStudent.setDirection(directionRepository.findById(directionId).get());
         newStudent.setPhoneNumber(student.getPhoneNumber());
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(newStudent.getEmail());
             message.setSubject("Ссылка для регистрации работает только 1 раз");
-            message.setText("Ваша ссылка для регистрации:" + link + "/" + newStudent.getEmail() + "/" + randomCode);
+            message.setText("Ваша ссылка для регистрации: " + link + "/" + newStudent.getEmail() + "/" + randomCode);
             javaMailSender.send(message);
         } catch (MailException e) {
-            throw new RuntimeException("Please enter a valid email address.");
+            throw new InvalidEmailException("Пожалуйста, введите действительный адрес электронной почты.");
         }
+
         try {
-            LOGGER.info("Saving Student {}", student.getEmail());
+            LOGGER.info("Сохранение студента {}", student.getEmail());
             studentUserRepository.save(newStudent);
         } catch (Exception e) {
-            LOGGER.error("Error during registration, {}", e.getMessage());
-            throw new UserExistException("The student " + newStudent.getFirstName() + " " + newStudent.getLastName() + " already exist");
+            LOGGER.error("Ошибка при регистрации, {}", e.getMessage());
+            throw new UserExistException("Студент " + newStudent.getFirstName() + " " + newStudent.getLastName() + " уже существует");
         }
+
         return findById(newStudent.getId());
     }
+
 
     public Student updateStudent(Long studentId, StudentDTO updatedStudentDTO) {
         Optional<Student> studentOptional = studentUserRepository.findById(studentId);
@@ -129,7 +133,7 @@ public class StudentUserService {
 
     public StudentDTO findStudentById(Long studentId) {
         Student student = studentUserRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("Стажер с ID: " + studentId + "не найден"));
+                .orElseThrow(() -> new NotFoundException("Стажер с ID: " + studentId + "не найден"));
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setImage(student.getImage());
@@ -154,7 +158,7 @@ public class StudentUserService {
 
     public Student getStudentById(Long studentId) {
         return studentUserRepository.findUserById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Student cannot be found"));
+                .orElseThrow(() -> new NotFoundException("Student cannot be found"));
     }
 
     @Transactional
@@ -203,7 +207,8 @@ public class StudentUserService {
         try {
             LOGGER.info("Попытка обновить статус студента с ID: {}", id);
 
-            Student student = getStudentById(id);
+            Student student = studentUserRepository.findUserById(id)
+                    .orElseThrow(() -> new NotFoundException("Student cannot be found"));
 
             LOGGER.debug("Текущий статус: {}, Новый статус: {}", student.getStatus(), newStatus);
 
@@ -219,13 +224,13 @@ public class StudentUserService {
                     updatedStudent.getLastName(),
                     updatedStudent.getEmail(),
                     updatedStudent.getPhoneNumber(),
-                    updatedStudent.getDirection().getName(), // Assuming Direction is an entity with a getName() method
+                    updatedStudent.getDirection().getName(),
                     updatedStudent.getStatus()
             );
 
-        } catch (EntityNotFoundException e) {
-            LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, e);
-            throw e;
+        } catch (NotFoundException ex) {
+            LOGGER.error("Ошибка обновления статуса: Студент с ID {} не найден", id, ex);
+            throw ex;
 
         } catch (IllegalArgumentException e) {
             LOGGER.error("Ошибка обновления статуса: Недопустимый аргумент для студента с ID: {}", id, e);
@@ -239,7 +244,7 @@ public class StudentUserService {
 
     public StudentDTO addPointForStudent(Long studentId, Integer point) {
         Student student = studentUserRepository.findById(studentId).orElseThrow(
-                () -> new StudentNotFoundException("Not found student ID: " + studentId)
+                () -> new NotFoundException("Not found student ID: " + studentId)
         );
         student.setPoint(point);
         studentUserRepository.save(student);
@@ -248,7 +253,7 @@ public class StudentUserService {
 
     public StudentDTO findByIdStudentInfo(Long studentId) {
         studentUserRepository.findById(studentId).orElseThrow(
-                () -> new StudentNotFoundException("Not found student ID: " + studentId)
+                () -> new NotFoundException("Not found student ID: " + studentId)
         );
         StudentDTO dto = studentUserRepository.findByIdStudentDTO(studentId);
         dto.setProjects(projectRepository.findTitlesByStudentId(studentId));

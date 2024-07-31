@@ -109,15 +109,7 @@ public class ActivityController {
         return new ResponseEntity<>(activityErrorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler
-    private ResponseEntity<ActivityErrorResponse> handleException(ActivityNotCreatedException e) {
-            ActivityErrorResponse activityErrorResponse = new ActivityErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
-        );
 
-        return new ResponseEntity<>(activityErrorResponse, HttpStatus.NOT_FOUND);
-    }
 
 
 

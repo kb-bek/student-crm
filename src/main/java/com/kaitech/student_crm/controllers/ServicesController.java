@@ -1,11 +1,9 @@
 package com.kaitech.student_crm.controllers;
 
-import com.kaitech.student_crm.exceptions.ServiceNotFoundException;
 import com.kaitech.student_crm.payload.request.ServicesRequest;
 import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ServicesResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,8 +78,5 @@ public class ServicesController {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ServiceNotFoundException.class)
-    public ResponseEntity<MessageResponse> handleValidationExceptions(ServiceNotFoundException e) {
-        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
-    }
+
 }

@@ -3,8 +3,6 @@ package com.kaitech.student_crm.controllers;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
-import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
-import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;
@@ -14,7 +12,6 @@ import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.services.StudentUserService;
 import com.kaitech.student_crm.validations.ResponseErrorValidation;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +44,8 @@ public class StudentController {
 
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long studentId) {
-        try {
-            return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(studentUserService.findByIdStudentInfo(studentId), HttpStatus.OK);
+
     }
 
 
@@ -120,9 +112,5 @@ public class StudentController {
         return modelMapper.map(studentDTO, User.class);
     }
 
-    @ExceptionHandler(StudentNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private ResponseEntity<MessageResponse> handleLevelNotFound(StudentNotFoundException e) {
-        return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.NOT_FOUND);
-    }
+
 }

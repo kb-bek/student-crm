@@ -1,8 +1,6 @@
 package com.kaitech.student_crm.services;
 
-import com.kaitech.student_crm.dtos.DirectionDTO;
-import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
-import com.kaitech.student_crm.exceptions.ResourceNotFoundException;
+import com.kaitech.student_crm.exceptions.NotFoundException;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.DirectionCreateRequest;
@@ -17,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DirectionService {
@@ -52,7 +49,7 @@ public class DirectionService {
             Direction savedDirection = directionRepository.save(direction);
 
             DirectionResponse responseDTO = new DirectionResponse();
-            responseDTO.setId(savedDirection.getId()); // Устанавливаем id из сохраненного объекта
+            responseDTO.setId(savedDirection.getId());
             responseDTO.setName(savedDirection.getName());
             responseDTO.setDescription(savedDirection.getDescription());
 
@@ -84,7 +81,7 @@ public class DirectionService {
             direction.getStudents().add(student);
             return directionRepository.save(direction);
         } else {
-            throw new IllegalArgumentException("Direction or Student not found");
+            throw new NotFoundException("Direction or Student not found");
         }
     }
 
@@ -98,7 +95,7 @@ public class DirectionService {
 
     public void deleteDirection(Long id) {
         Direction direction = directionRepository.findById(id)
-                .orElseThrow(() -> new DirectionNotFoundException("Direction not found"));
+                .orElseThrow(() -> new NotFoundException("Direction not found"));
 
         directionRepository.delete(direction);
     }
@@ -110,9 +107,8 @@ public class DirectionService {
 
     public DirectionResponse getById(Long id) {
         Direction direction = directionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Direction not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Direction not found with id: " + id));
 
-        // Создание объекта DirectionResponse с нужными полями
         DirectionResponse response = new DirectionResponse();
         response.setId(direction.getId());
         response.setName(direction.getName());
