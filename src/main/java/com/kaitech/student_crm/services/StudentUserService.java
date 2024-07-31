@@ -84,7 +84,7 @@ public class StudentUserService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(newStudent.getEmail());
             message.setSubject("Ссылка для регистрации работает только 1 раз");
-            message.setText("Ваша ссылка для регистрации:" + link + "/" + newStudent.getEmail() + "/" + randomCode);
+            message.setText("Ваша ссылка для регистрации: " + link + "/" + newStudent.getEmail() + "/" + randomCode);
             javaMailSender.send(message);
         } catch (MailException e) {
             LOGGER.error("Ошибка при отправке письма на email: {}", newStudent.getEmail());
@@ -96,7 +96,7 @@ public class StudentUserService {
             studentUserRepository.save(newStudent);
         } catch (Exception e) {
             LOGGER.error("Ошибка при регистрации, {}", e.getMessage());
-            throw new UserExistException("The student " + newStudent.getFirstName() + " " + newStudent.getLastName() + " already exists");
+            throw new UserExistException("Студент " + newStudent.getFirstName() + " " + newStudent.getLastName() + " уже существует");
         }
 
         return findById(newStudent.getId());

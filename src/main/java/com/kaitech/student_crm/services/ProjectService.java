@@ -5,7 +5,6 @@ import com.kaitech.student_crm.exceptions.ProjectAlreadyCompletedException;
 import com.kaitech.student_crm.models.Project;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.payload.request.ProjectRequest;
-import com.kaitech.student_crm.payload.response.MessageResponse;
 import com.kaitech.student_crm.payload.response.ProjectResponse;
 import com.kaitech.student_crm.payload.response.StudentResponse;
 import com.kaitech.student_crm.repositories.ProjectRepository;
@@ -53,12 +52,12 @@ public class ProjectService {
         }
 
         project.getStudents().addAll(students);
-
         projectRepository.save(project);
 
         LOGGER.info("Студенты успешно добавлены в проект с id: {}", projectId);
         return findByIdResponse(project.getId());
     }
+
 
 
     public List<ProjectResponse> getAllProjects() {
