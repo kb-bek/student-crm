@@ -5,88 +5,22 @@ import com.kaitech.student_crm.models.enums.ProjectType;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ProjectResponse {
 
-    private Long id;
-    private String title;
-    private String description;
-    private ProjectType projectType;
-    private List<StudentResponse> students;
-    private LocalDate startDate;
-    private LocalDate endDate;
-
-    public ProjectResponse(){}
-
+public record ProjectResponse(
+        Long id,
+        String title,
+        String description,
+        ProjectType projectType,
+        List<StudentResponse> students,
+        LocalDate startDate,
+        LocalDate endDate
+) {
     public ProjectResponse(Long id, String title, String description, ProjectType projectType, LocalDate startDate, LocalDate endDate) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.projectType = projectType;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this(id, title, description, projectType, null, startDate, endDate);
     }
 
     public ProjectResponse(Long id, String title, String description, ProjectType projectType, List<StudentResponse> students) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.projectType = projectType;
-        this.students = students;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ProjectType getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(ProjectType projectType) {
-        this.projectType = projectType;
-    }
-
-    public List<StudentResponse> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<StudentResponse> students) {
-        this.students = students;
-    }
-
-    public LocalDate getEndDate(LocalDate endDate) {
-        return this.endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+        this(id, title, description, projectType, students, null, null);
     }
 }
+
