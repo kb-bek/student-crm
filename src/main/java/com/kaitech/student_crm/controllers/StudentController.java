@@ -3,7 +3,6 @@ package com.kaitech.student_crm.controllers;
 import com.kaitech.student_crm.dtos.StudentDTO;
 import com.kaitech.student_crm.exceptions.EmailAlreadyExistsException;
 import com.kaitech.student_crm.dtos.StudentDTOForAll;
-import com.kaitech.student_crm.exceptions.StudentNotFoundException;
 import com.kaitech.student_crm.models.Student;
 import com.kaitech.student_crm.models.User;
 import com.kaitech.student_crm.models.enums.Status;

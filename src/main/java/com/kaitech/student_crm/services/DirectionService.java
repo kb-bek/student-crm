@@ -1,7 +1,5 @@
 package com.kaitech.student_crm.services;
 
-import com.kaitech.student_crm.exceptions.DirectionNotFoundException;
-import com.kaitech.student_crm.exceptions.ResourceNotFoundException;
 import com.kaitech.student_crm.exceptions.NotFoundException;
 import com.kaitech.student_crm.models.Direction;
 import com.kaitech.student_crm.models.Student;
