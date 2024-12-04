@@ -13,9 +13,9 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @ManyToOne
     @JoinColumn(name = "activity_id", nullable = false)
@@ -25,17 +25,19 @@ public class Report {
     @JoinColumn(name = "weeksday_id", nullable = false)
     private Weeksday weeksday;
 
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
+    @Column(nullable = false)
+    private boolean isDone;
+
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
     public Report() {
     }
 
-    public Report(User user, Activity activity, Weeksday weeksday) {
-        this.user = user;
+    public Report(Activity activity, Weeksday weeksday) {
         this.activity = activity;
         this.weeksday = weeksday;
+        this.isDone = isDone();
     }
 
     @PrePersist
@@ -43,15 +45,18 @@ public class Report {
         this.createdDate = LocalDateTime.now();
     }
 
-
-
-
-    public User getUser() {
-        return user;
+    public Student getStudent() {
+        return student;
+    }
+    public boolean isDone() {
+        return isDone;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setDone(boolean done) {
+        isDone = done;
+    }
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public Activity getActivity() {
